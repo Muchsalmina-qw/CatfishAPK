@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <base target="_top">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: Arial, sans-serif;
+      background: #f4f5f9;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      background: white;
+      padding: 28px;
+      border-radius: 20px;
+      box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin: 0 0 28px 0;
+    }
+
+    h2 {
+      color: #3478c7;
+      margin-top: 30px;
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: block;
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 64px;
+      padding: 0 16px;
+      font-size: 20px;
+      border: 1px solid #cccccc;
+      border-radius: 12px;
+      background: white;
+    }
+
+    input:focus,
+    select:focus {
+      outline: 2px solid #1976d2;
+      border-color: #1976d2;
+    }
+
+    button {
+      width: 100%;
+      min-height: 64px;
+      margin-top: 24px;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #1976d2;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button:disabled {
+      background: #999999;
+      cursor: not-allowed;
+    }
+
+    .tombolKeuntungan {
+      background: #2e7d32;
+    }
+
+    .tombolKembali {
+      background: #555555;
+    }
+
+    #pesan {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+    .formBagian {
+      display: none;
+    }
+
+    .aktif {
+      display: block;
+    }
+
+    #halamanKeuntungan {
+      display: none;
+    }
+
+    .loading {
+      text-align: center;
+      font-size: 18px;
+      padding: 30px 10px;
+    }
+
+    .judulBagian {
+      font-size: 22px;
+      font-weight: bold;
+      color: #3478c7;
+      margin-top: 28px;
+      margin-bottom: 10px;
+    }
+
+    .tabelKeuntungan {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 25px;
+    }
+
+    .tabelKeuntungan th,
+    .tabelKeuntungan td {
+      border: 1px solid #444444;
+      padding: 14px 8px;
+      text-align: center;
+    }
+
+    .tabelKeuntungan th {
+      background: #4285d4;
+      color: white;
+      font-size: 17px;
+    }
+
+    .tabelKeuntungan td {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .hasilProfit {
+      background: #f44336;
+      color: white;
+    }
+
+    .pembagian td {
+      background: #f44336;
+      color: white;
+    }
+
+    @media (max-width: 500px) {
+
+      body {
+        padding: 14px;
+      }
+
+      .container {
+        padding: 20px;
+        border-radius: 18px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      input,
+      select {
+        height: 58px;
+        font-size: 18px;
+      }
+
+      .tabelKeuntungan th {
+        font-size: 14px;
+        padding: 10px 4px;
+      }
+
+      .tabelKeuntungan td {
+        font-size: 16px;
+        padding: 12px 4px;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+  <!-- ==================================================
+       HALAMAN HOME / INPUT
+  =================================================== -->
+
+  <div id="halamanHome">
+
+    <h1>Input Data Catfish</h1>
+
+
+    <label for="jenisData">
+      Pilih Jenis Data
+    </label>
+
+    <select
+      id="jenisData"
+      onchange="ubahJenisData()"
+    >
+
+      <option value="penjualan">
+        Penjualan
+      </option>
+
+      <option value="pinjaman">
+        Pinjaman
+      </option>
+
+      <option value="modalBahan">
+        Modal / Bahan Baku Produksi
+      </option>
+
+      <option value="modalTambahan">
+        Pengeluaran Tambahan
+      </option>
+
+    </select>
+
+
+    <!-- ==============================================
+         FORM PENJUALAN
+    =============================================== -->
+
+    <div
+      id="formPenjualan"
+      class="formBagian aktif"
+    >
+
+      <label>
+        Pilih Tabel Tujuan
+      </label>
+
+      <select
+        id="tujuanPenjualan"
+        onchange="ubahTujuanPenjualan()"
+      >
+
+        <option value="Penjualan">
+          Penjualan
+        </option>
+
+        <option value="Tester">
+          Tester
+        </option>
+
+        <option value="Kematian">
+          Kematian
+        </option>
+
+      </select>
+
+
+      <label>
+        Nama Item
+      </label>
+
+      <input
+        id="namaItemPenjualan"
+        type="text"
+        value="Penjualan Ikan Segar"
+      >
+
+
+      <label>
+        Satuan
+      </label>
+
+      <select id="satuanPenjualan">
+
+        <option value="Kg">
+          Kg
+        </option>
+
+        <option value="Ekor">
+          Ekor
+        </option>
+
+        <option value="Pcs">
+          Pcs
+        </option>
+
+      </select>
+
+
+      <label>
+        Tanggal
+      </label>
+
+      <input
+        id="tanggalPenjualan"
+        type="date"
+      >
+
+
+      <label>
+        Harga / Satuan
+      </label>
+
+      <input
+        id="hargaPenjualan"
+        type="number"
+        value="25000"
+        min="0"
+      >
+
+
+      <label>
+        Jumlah / UOM
+      </label>
+
+      <input
+        id="jumlahPenjualan"
+        type="number"
+        step="0.001"
+        min="0"
+        placeholder="Contoh: 0.600"
+      >
+
+    </div>
+
+
+    <!-- ==============================================
+         FORM PINJAMAN
+    =============================================== -->
+
+    <div
+      id="formPinjaman"
+      class="formBagian"
+    >
+
+      <label>
+        Pilih Peminjam
+      </label>
+
+      <select id="peminjam">
+
+        <option value="Martunis">
+          Pinjaman Martunis
+        </option>
+
+        <option value="Muchsal">
+          Pinjaman Muchsal
+        </option>
+
+      </select>
+
+
+      <label>
+        Deskripsi
+      </label>
+
+      <input
+        id="deskripsiPinjaman"
+        type="text"
+        placeholder="Contoh: Pinjaman Tunai"
+      >
+
+
+      <label>
+        Tanggal
+      </label>
+
+      <input
+        id="tanggalPinjaman"
+        type="date"
+      >
+
+
+      <label>
+        Jumlah
+      </label>
+
+      <input
+        id="jumlahPinjaman"
+        type="number"
+        min="0"
+        placeholder="Contoh: 25000"
+      >
+
+    </div>
+
+
+    <!-- ==============================================
+         FORM MODAL BAHAN BAKU
+    =============================================== -->
+
+    <div
+      id="formModalBahan"
+      class="formBagian"
+    >
+
+      <label>
+        Deskripsi
+      </label>
+
+      <input
+        id="deskripsiModal"
+        type="text"
+        placeholder="Contoh: Pakan"
+      >
+
+
+      <label>
+        Harga
+      </label>
+
+      <input
+        id="hargaModal"
+        type="number"
+        min="0"
+        placeholder="Contoh: 300000"
+      >
+
+
+      <label>
+        Satuan
+      </label>
+
+      <select id="satuanModal">
+
+        <option value="ekor">Ekor</option>
+        <option value="zak">Zak</option>
+        <option value="btl">Botol</option>
+        <option value="ltr">Liter</option>
+        <option value="bln">Bulan</option>
+        <option value="kilo">Kilo</option>
+        <option value="pcs">Pcs</option>
+
+      </select>
+
+
+      <label>
+        Qty
+      </label>
+
+      <input
+        id="qtyModal"
+        type="number"
+        step="0.01"
+        min="0"
+        placeholder="Contoh: 1"
+      >
+
+    </div>
+
+
+    <!-- ==============================================
+         FORM PENGELUARAN TAMBAHAN
+    =============================================== -->
+
+    <div
+      id="formModalTambahan"
+      class="formBagian"
+    >
+
+      <label>
+        Deskripsi
+      </label>
+
+      <input
+        id="deskripsiTambahan"
+        type="text"
+        placeholder="Contoh: Minyak Becak"
+      >
+
+
+      <label>
+        Tanggal
+      </label>
+
+      <input
+        id="tanggalTambahan"
+        type="date"
+      >
+
+
+      <label>
+        Jumlah
+      </label>
+
+      <input
+        id="jumlahTambahan"
+        type="number"
+        min="0"
+        placeholder="Contoh: 20000"
+      >
+
+    </div>
+
+
+    <!-- TOMBOL SIMPAN -->
+
+    <button
+      id="tombolSimpan"
+      onclick="simpan()"
+    >
+      Simpan Data
+    </button>
+
+
+    <!-- TOMBOL LIHAT KEUNTUNGAN -->
+
+    <button
+      type="button"
+      class="tombolKeuntungan"
+      onclick="lihatKeuntungan()"
+    >
+      Lihat Keuntungan
+    </button>
+
+
+    <div id="pesan"></div>
+
+  </div>
+
+
+  <!-- ==================================================
+       HALAMAN KEUNTUNGAN
+  =================================================== -->
+
+  <div id="halamanKeuntungan">
+
+    <h1>Keuntungan</h1>
+
+
+    <div
+      id="loadingKeuntungan"
+      class="loading"
+    >
+      Memuat data keuntungan...
+    </div>
+
+
+    <div
+      id="isiKeuntungan"
+      style="display: none;"
+    >
+
+
+      <!-- PROFIT / LOSS -->
+
+      <div class="judulBagian">
+        PROFIT/LOSS
+      </div>
+
+      <table class="tabelKeuntungan">
+
+        <tr>
+          <th>Total Pengeluaran</th>
+          <th>Total Pemasukan</th>
+          <th>Profit/Loss</th>
+        </tr>
+
+        <tr>
+          <td id="profitPengeluaran">-</td>
+          <td id="profitPemasukan">-</td>
+          <td
+            id="profitHasil"
+            class="hasilProfit"
+          >
+            -
+          </td>
+        </tr>
+
+      </table>
+
+
+      <!-- TOTAL MODAL KESELURUHAN -->
+
+      <div class="judulBagian">
+        TOTAL MODAL KESELURUHAN
+      </div>
+
+      <table class="tabelKeuntungan">
+
+        <tr>
+          <th>Total Pengeluaran</th>
+          <th>Total Pemasukan</th>
+          <th>Profit/Loss</th>
+        </tr>
+
+        <tr>
+          <td id="modalPengeluaran">-</td>
+          <td id="modalPemasukan">-</td>
+          <td
+            id="modalHasil"
+            class="hasilProfit"
+          >
+            -
+          </td>
+        </tr>
+
+      </table>
+
+
+      <!-- PEMBAGIAN HASIL -->
+
+      <div class="judulBagian">
+        PEMBAGIAN HASIL
+      </div>
+
+      <table
+        class="tabelKeuntungan pembagian"
+      >
+
+        <tr>
+          <th>MUCHSAL</th>
+          <th>MARTUNIS</th>
+        </tr>
+
+        <tr>
+          <td id="hasilMuchsal">-</td>
+          <td id="hasilMartunis">-</td>
+        </tr>
+
+      </table>
+
+    </div>
+
+
+    <!-- TOMBOL KEMBALI KE HOME -->
+
+    <button
+      type="button"
+      class="tombolKembali"
+      onclick="kembaliKeHome()"
+    >
+      ← Kembali ke Home
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+
+/* ==================================================
+   TANGGAL HARI INI
+================================================== */
+
+const tanggalHariIni =
+  new Date()
+    .toISOString()
+    .split('T')[0];
+
+document
+  .getElementById('tanggalPenjualan')
+  .value = tanggalHariIni;
+
+document
+  .getElementById('tanggalPinjaman')
+  .value = tanggalHariIni;
+
+document
+  .getElementById('tanggalTambahan')
+  .value = tanggalHariIni;
+
+
+/* ==================================================
+   GANTI JENIS FORM
+================================================== */
+
+function ubahJenisData() {
+
+  const jenis =
+    document
+      .getElementById('jenisData')
+      .value;
+
+  const semuaForm = [
+    'formPenjualan',
+    'formPinjaman',
+    'formModalBahan',
+    'formModalTambahan'
+  ];
+
+  semuaForm.forEach(
+    function(id) {
+      document
+        .getElementById(id)
+        .classList.remove('aktif');
+    }
+  );
+
+  if (jenis === 'penjualan') {
+    document
+      .getElementById('formPenjualan')
+      .classList.add('aktif');
+  }
+
+  if (jenis === 'pinjaman') {
+    document
+      .getElementById('formPinjaman')
+      .classList.add('aktif');
+  }
+
+  if (jenis === 'modalBahan') {
+    document
+      .getElementById('formModalBahan')
+      .classList.add('aktif');
+  }
+
+  if (jenis === 'modalTambahan') {
+    document
+      .getElementById('formModalTambahan')
+      .classList.add('aktif');
+  }
+
+  document
+    .getElementById('pesan')
+    .innerText = '';
+}
+
+
+/* ==================================================
+   OTOMATIS NAMA ITEM PENJUALAN
+================================================== */
+
+function ubahTujuanPenjualan() {
+
+  const tujuan =
+    document
+      .getElementById('tujuanPenjualan')
+      .value;
+
+  const namaItem =
+    document
+      .getElementById('namaItemPenjualan');
+
+  if (tujuan === 'Penjualan') {
+    namaItem.value =
+      'Penjualan Ikan Segar';
+  }
+
+  if (tujuan === 'Tester') {
+    namaItem.value =
+      'Tester Ikan';
+  }
+
+  if (tujuan === 'Kematian') {
+    namaItem.value =
+      'Ikan Mati';
+  }
+}
+
+
+/* ==================================================
+   SIMPAN DATA
+================================================== */
+
+function simpan() {
+
+  const jenis =
+    document
+      .getElementById('jenisData')
+      .value;
+
+  const tombol =
+    document
+      .getElementById('tombolSimpan');
+
+  const pesan =
+    document
+      .getElementById('pesan');
+
+  let data = {};
+
+
+  /* PENJUALAN */
+
+  if (jenis === 'penjualan') {
+
+    data = {
+
+      jenisForm: 'penjualan',
+
+      tujuan:
+        document
+          .getElementById('tujuanPenjualan')
+          .value,
+
+      namaItem:
+        document
+          .getElementById('namaItemPenjualan')
+          .value,
+
+      satuan:
+        document
+          .getElementById('satuanPenjualan')
+          .value,
+
+      tanggal:
+        document
+          .getElementById('tanggalPenjualan')
+          .value,
+
+      harga:
+        document
+          .getElementById('hargaPenjualan')
+          .value,
+
+      jumlah:
+        document
+          .getElementById('jumlahPenjualan')
+          .value
+
+    };
+
+    if (
+      !data.namaItem ||
+      !data.tanggal ||
+      !data.harga ||
+      !data.jumlah
+    ) {
+      tampilkanError(
+        'Mohon isi semua data Penjualan.'
+      );
+      return;
+    }
+  }
+
+
+  /* PINJAMAN */
+
+  if (jenis === 'pinjaman') {
+
+    data = {
+
+      jenisForm: 'pinjaman',
+
+      peminjam:
+        document
+          .getElementById('peminjam')
+          .value,
+
+      deskripsi:
+        document
+          .getElementById('deskripsiPinjaman')
+          .value,
+
+      tanggal:
+        document
+          .getElementById('tanggalPinjaman')
+          .value,
+
+      jumlah:
+        document
+          .getElementById('jumlahPinjaman')
+          .value
+
+    };
+
+    if (
+      !data.deskripsi ||
+      !data.tanggal ||
+      !data.jumlah
+    ) {
+      tampilkanError(
+        'Mohon isi semua data Pinjaman.'
+      );
+      return;
+    }
+  }
+
+
+  /* MODAL BAHAN BAKU */
+
+  if (jenis === 'modalBahan') {
+
+    data = {
+
+      jenisForm: 'modalBahan',
+
+      deskripsi:
+        document
+          .getElementById('deskripsiModal')
+          .value,
+
+      harga:
+        document
+          .getElementById('hargaModal')
+          .value,
+
+      satuan:
+        document
+          .getElementById('satuanModal')
+          .value,
+
+      qty:
+        document
+          .getElementById('qtyModal')
+          .value
+
+    };
+
+    if (
+      !data.deskripsi ||
+      !data.harga ||
+      !data.qty
+    ) {
+      tampilkanError(
+        'Mohon isi semua data Modal.'
+      );
+      return;
+    }
+  }
+
+
+  /* PENGELUARAN TAMBAHAN */
+
+  if (jenis === 'modalTambahan') {
+
+    data = {
+
+      jenisForm: 'modalTambahan',
+
+      deskripsi:
+        document
+          .getElementById('deskripsiTambahan')
+          .value,
+
+      tanggal:
+        document
+          .getElementById('tanggalTambahan')
+          .value,
+
+      jumlah:
+        document
+          .getElementById('jumlahTambahan')
+          .value
+
+    };
+
+    if (
+      !data.deskripsi ||
+      !data.tanggal ||
+      !data.jumlah
+    ) {
+      tampilkanError(
+        'Mohon isi semua data Pengeluaran Tambahan.'
+      );
+      return;
+    }
+  }
+
+
+  tombol.disabled = true;
+  tombol.innerText = 'Menyimpan...';
+
+  pesan.style.color = '#333333';
+  pesan.innerText = 'Sedang menyimpan data...';
+
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(hasil) {
+
+        pesan.style.color = 'green';
+        pesan.innerText = hasil;
+
+        bersihkanForm(jenis);
+
+        tombol.disabled = false;
+        tombol.innerText = 'Simpan Data';
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        pesan.style.color = 'red';
+
+        pesan.innerText =
+          'Gagal: ' + error.message;
+
+        tombol.disabled = false;
+        tombol.innerText = 'Simpan Data';
+      }
+    )
+
+    .simpanData(data);
+}
+
+
+/* ==================================================
+   LIHAT KEUNTUNGAN
+================================================== */
+
+function lihatKeuntungan() {
+
+  document
+    .getElementById('halamanHome')
+    .style.display = 'none';
+
+  document
+    .getElementById('halamanKeuntungan')
+    .style.display = 'block';
+
+  document
+    .getElementById('loadingKeuntungan')
+    .style.display = 'block';
+
+  document
+    .getElementById('isiKeuntungan')
+    .style.display = 'none';
+
+
+  google.script.run
+
+    .withSuccessHandler(
+      function(data) {
+
+        document
+          .getElementById('profitPengeluaran')
+          .innerText =
+            data.profitLoss.totalPengeluaran;
+
+        document
+          .getElementById('profitPemasukan')
+          .innerText =
+            data.profitLoss.totalPemasukan;
+
+        document
+          .getElementById('profitHasil')
+          .innerText =
+            data.profitLoss.hasil;
+
+
+        document
+          .getElementById('modalPengeluaran')
+          .innerText =
+            data.totalModal.totalPengeluaran;
+
+        document
+          .getElementById('modalPemasukan')
+          .innerText =
+            data.totalModal.totalPemasukan;
+
+        document
+          .getElementById('modalHasil')
+          .innerText =
+            data.totalModal.hasil;
+
+
+        document
+          .getElementById('hasilMuchsal')
+          .innerText =
+            data.pembagian.muchsal;
+
+        document
+          .getElementById('hasilMartunis')
+          .innerText =
+            data.pembagian.martunis;
+
+
+        document
+          .getElementById('loadingKeuntungan')
+          .style.display = 'none';
+
+        document
+          .getElementById('isiKeuntungan')
+          .style.display = 'block';
+      }
+    )
+
+    .withFailureHandler(
+      function(error) {
+
+        document
+          .getElementById('loadingKeuntungan')
+          .innerText =
+            'Gagal mengambil data: ' +
+            error.message;
+      }
+    )
+
+    .ambilDataKeuntungan();
+}
+
+
+/* ==================================================
+   KEMBALI KE HOME
+================================================== */
+
+function kembaliKeHome() {
+
+  document
+    .getElementById('halamanKeuntungan')
+    .style.display = 'none';
+
+  document
+    .getElementById('halamanHome')
+    .style.display = 'block';
+
+  document
+    .getElementById('pesan')
+    .innerText = '';
+}
+
+
+/* ==================================================
+   TAMPILKAN ERROR
+================================================== */
+
+function tampilkanError(teks) {
+
+  const pesan =
+    document
+      .getElementById('pesan');
+
+  pesan.style.color = 'red';
+  pesan.innerText = teks;
+}
+
+
+/* ==================================================
+   BERSIHKAN FORM
+================================================== */
+
+function bersihkanForm(jenis) {
+
+  if (jenis === 'penjualan') {
+
+    document
+      .getElementById('jumlahPenjualan')
+      .value = '';
+  }
+
+
+  if (jenis === 'pinjaman') {
+
+    document
+      .getElementById('deskripsiPinjaman')
+      .value = '';
+
+    document
+      .getElementById('jumlahPinjaman')
+      .value = '';
+  }
+
+
+  if (jenis === 'modalBahan') {
+
+    document
+      .getElementById('deskripsiModal')
+      .value = '';
+
+    document
+      .getElementById('hargaModal')
+      .value = '';
+
+    document
+      .getElementById('qtyModal')
+      .value = '';
+  }
+
+
+  if (jenis === 'modalTambahan') {
+
+    document
+      .getElementById('deskripsiTambahan')
+      .value = '';
+
+    document
+      .getElementById('jumlahTambahan')
+      .value = '';
+  }
+}
+
+
+</script>
+
+</body>
+
+</html>
