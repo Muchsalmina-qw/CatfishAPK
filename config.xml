@@ -17,7 +17,8 @@
 
     <icon src="www/img/logo.png" />
 
-    <splash src="www/img/logo.png" />
+    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="www/img/logo.png" />
+    <preference name="SplashScreenDelay" value="3000" />
 
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
