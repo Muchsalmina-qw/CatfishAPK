@@ -6,19 +6,16 @@
     <name>Catfish</name>
 
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        Catfish Application
     </description>
 
     <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
-        Apache Cordova Team
+        Catfish Team
     </author>
 
     <content src="index.html" />
 
     <icon src="www/img/logo.png" />
-
-    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="www/img/logo.png" />
-    <preference name="SplashScreenDelay" value="3000" />
 
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
