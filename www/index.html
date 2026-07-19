@@ -49,17 +49,32 @@
   .merah { border-left: 5px solid #d32f2f; }
   .ungu { border-left: 5px solid #7b1fa2; }
 
-  label { display: block; font-size: 16px; font-weight: bold; margin-top: 18px; margin-bottom: 8px; }
+  label { display: block; font-size: 14px; font-weight: bold; margin-top: 14px; margin-bottom: 6px; }
+
   input, select {
-    width: 100%; height: 58px; padding: 0 15px; font-size: 17px;
-    border: 1px solid #ccc; border-radius: 11px; background: white;
+    width: 100%; height: 46px; padding: 0 12px; font-size: 15px;
+    border: 1px solid #d5dae0; border-radius: 9px; background: white;
+    color: #202124;
   }
-  input:focus, select:focus { outline: 2px solid #1976d2; border-color: #1976d2; }
-  .keterangan { font-size: 13px; color: #777; margin-top: 5px; }
+
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 38px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'><path d='M1 1L7 7L13 1' stroke='%235f6b7a' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  select:hover { border-color: #b9c2cc; }
+
+  input:focus, select:focus { outline: none; border-color: #1976d2; box-shadow: 0 0 0 3px rgba(25,118,210,0.15); }
+  .keterangan { font-size: 12px; color: #777; margin-top: 4px; }
 
   button {
-    width: 100%; min-height: 58px; border: none; border-radius: 11px;
-    font-size: 17px; font-weight: bold; cursor: pointer; padding: 12px 15px;
+    width: 100%; min-height: 44px; border: none; border-radius: 9px;
+    font-size: 14px; font-weight: bold; cursor: pointer; padding: 8px 10px;
   }
   button:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -70,8 +85,43 @@
   .btnAbu { background: #555; color: white; }
   .btnDashboard { background: #263238; color: white; }
 
-  .menuButton { margin-top: 12px; }
-  .tombolSimpan { margin-top: 28px; }
+  .menuButton { margin-top: 8px; }
+  .tombolSimpan { margin-top: 18px; }
+
+  .buttonGrid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;
+  }
+  .buttonGrid button { margin-top: 0; }
+
+  /* ===== CUSTOM DROPDOWN (pengganti native select) ===== */
+  .customSelect { position: relative; }
+
+  .customSelectBtn {
+    width: 100%; height: 46px; padding: 0 14px; font-size: 15px;
+    border: 1px solid #d5dae0; border-radius: 9px; background: white;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    color: #202124;
+  }
+  .customSelectBtn.terbuka { border-color: #1976d2; box-shadow: 0 0 0 3px rgba(25,118,210,0.15); }
+
+  .csArrow { flex-shrink: 0; margin-left: 10px; transition: transform 0.15s ease; }
+  .customSelectBtn.terbuka .csArrow { transform: rotate(180deg); }
+
+  .customSelectPanel {
+    display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+    background: white; border-radius: 12px; box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+    border: 1px solid #e5e8eb; z-index: 50; overflow-y: auto; max-height: 260px;
+  }
+  .customSelectPanel.aktif { display: block; }
+
+  .customSelectItem {
+    padding: 13px 16px; font-size: 15px; color: #202124; cursor: pointer;
+    border-bottom: 1px solid #f0f2f4;
+  }
+  .customSelectItem:last-child { border-bottom: none; }
+  .customSelectItem:active { background: #f1f4f8; }
+  .customSelectItem.terpilih { background: #e8f0fe; color: #1976d2; font-weight: bold; }
 
   .formBagian { display: none; }
   .formBagian.aktif { display: block; }
@@ -164,11 +214,12 @@
     <h2>Informasi Stock</h2>
     <p><strong>Terakhir Update:</strong> <span id="dashUpdateStock">-</span></p>
 
-    <button class="btnBiru menuButton" onclick="bukaInput()">+ Input Data</button>
-    <button class="btnHijau menuButton" onclick="bukaLihatData()">Lihat &amp; Kelola Data</button>
-    <button class="btnOrange menuButton" onclick="bukaKeuntungan()">Lihat Keuntungan</button>
-    <button class="btnUngu menuButton" onclick="bukaInputStock()">Tambah Stock</button>
-    <button class="btnDashboard menuButton" onclick="muatDashboard()">Refresh Dashboard</button>
+    <div class="buttonGrid">
+      <button class="btnBiru" onclick="bukaInput()">+ Input Data</button>
+      <button class="btnHijau" onclick="bukaLihatData()">Lihat &amp; Kelola Data</button>
+      <button class="btnOrange" onclick="bukaKeuntungan()">Lihat Keuntungan</button>
+      <button class="btnUngu" onclick="bukaInputStock()">Tambah Stock</button>
+    </div>
   </div>
 
 </div>
@@ -180,40 +231,47 @@
     <h2>Input Data</h2>
 
     <label>Pilih Jenis Data</label>
-    <select id="jenisData" onchange="ubahJenisData()">
-      <option value="penjualan">Penjualan</option>
-      <option value="pinjaman">Pinjaman</option>
-      <option value="modalBahan">Modal / Bahan Baku</option>
-      <option value="modalTambahan">Pengeluaran Tambahan</option>
-    </select>
+    <div class="customSelect">
+      <div class="customSelectBtn" onclick="csToggle('jenisData')">
+        <span id="jenisData_label">Penjualan</span>
+        <svg class="csArrow" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1L7 7L13 1" stroke="#5f6b7a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="customSelectPanel" id="jenisData_panel">
+        <div class="customSelectItem terpilih" data-value="penjualan" onclick="csPilih('jenisData','penjualan','Penjualan')">Penjualan</div>
+        <div class="customSelectItem" data-value="tester" onclick="csPilih('jenisData','tester','Tester')">Tester</div>
+        <div class="customSelectItem" data-value="kematian" onclick="csPilih('jenisData','kematian','Kematian')">Kematian</div>
+        <div class="customSelectItem" data-value="pinjaman" onclick="csPilih('jenisData','pinjaman','Pinjaman')">Pinjaman</div>
+        <div class="customSelectItem" data-value="modalBahan" onclick="csPilih('jenisData','modalBahan','Modal / Bahan Baku')">Modal / Bahan Baku</div>
+        <div class="customSelectItem" data-value="modalTambahan" onclick="csPilih('jenisData','modalTambahan','Pengeluaran Tambahan')">Pengeluaran Tambahan</div>
+      </div>
+    </div>
+    <input type="hidden" id="jenisData" value="penjualan">
 
     <!-- PENJUALAN -->
     <div id="formPenjualan" class="formBagian aktif">
 
-      <label>Pilih Tabel Tujuan</label>
-      <select id="tujuanPenjualan" onchange="ubahTujuanPenjualan()">
-        <option value="Penjualan">Penjualan</option>
-        <option value="Tester">Tester</option>
-        <option value="Kematian">Kematian</option>
-      </select>
-
       <label>Nama Item</label>
       <input id="namaItemPenjualan" type="text" value="Penjualan Ikan Segar">
 
-      <div id="dataCustomer">
-        <label>Nama Customer</label>
-        <input id="namaCustomer" type="text" placeholder="Opsional / boleh dikosongkan">
+      <label>Nama Customer</label>
+      <input id="namaCustomer" type="text" placeholder="Opsional / boleh dikosongkan">
 
-        <label>Nomor HP Customer</label>
-        <input id="nomorHp" type="tel" placeholder="Opsional / boleh dikosongkan">
-      </div>
+      <label>Nomor HP Customer</label>
+      <input id="nomorHp" type="tel" placeholder="Opsional / boleh dikosongkan">
 
       <label>Satuan</label>
-      <select id="satuanPenjualan">
-        <option value="Kg">Kg</option>
-        <option value="Ekor">Ekor</option>
-        <option value="Pcs">Pcs</option>
-      </select>
+      <div class="customSelect">
+        <div class="customSelectBtn" onclick="csToggle('satuanPenjualan')">
+          <span id="satuanPenjualan_label">Kg</span>
+          <svg class="csArrow" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1L7 7L13 1" stroke="#5f6b7a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="customSelectPanel" id="satuanPenjualan_panel">
+          <div class="customSelectItem terpilih" data-value="Kg" onclick="csPilih('satuanPenjualan','Kg','Kg')">Kg</div>
+          <div class="customSelectItem" data-value="Ekor" onclick="csPilih('satuanPenjualan','Ekor','Ekor')">Ekor</div>
+          <div class="customSelectItem" data-value="Pcs" onclick="csPilih('satuanPenjualan','Pcs','Pcs')">Pcs</div>
+        </div>
+      </div>
+      <input type="hidden" id="satuanPenjualan" value="Kg">
 
       <label>Tanggal</label>
       <input id="tanggalPenjualan" type="date">
@@ -225,23 +283,48 @@
       <input id="beratBayar" type="text" inputmode="decimal" placeholder="Contoh: 0.5 atau 0,5">
       <div class="keterangan">Berat yang digunakan untuk menghitung subtotal.</div>
 
-      <div id="inputDetailPenjualan">
-        <label>Berat Asli Timbangan</label>
-        <input id="beratTimbangan" type="text" inputmode="decimal" placeholder="Contoh: 0.502 atau 0,502">
+      <label>Berat Asli Timbangan</label>
+      <input id="beratTimbangan" type="text" inputmode="decimal" placeholder="Contoh: 0.502 atau 0,502">
 
-        <label>Jumlah Ekor</label>
-        <input id="jumlahEkor" type="number" min="0" step="1" placeholder="Contoh: 8">
-      </div>
+      <label>Jumlah Ekor</label>
+      <input id="jumlahEkor" type="number" min="0" step="1" placeholder="Contoh: 8">
 
+    </div>
+
+    <!-- TESTER -->
+    <div id="formTester" class="formBagian">
+      <label>Tanggal</label>
+      <input id="tanggalTester" type="date">
+
+      <label>Berat (Kg)</label>
+      <input id="beratTester" type="text" inputmode="decimal" placeholder="Contoh: 0.5 atau 0,5">
+      <div class="keterangan">Berat ikan untuk tester, akan mengurangi sisa stock.</div>
+    </div>
+
+    <!-- KEMATIAN -->
+    <div id="formKematian" class="formBagian">
+      <label>Tanggal</label>
+      <input id="tanggalKematian" type="date">
+
+      <label>Berat (Kg)</label>
+      <input id="beratKematian" type="text" inputmode="decimal" placeholder="Contoh: 0.3 atau 0,3">
+      <div class="keterangan">Berat ikan yang mati, akan mengurangi sisa stock.</div>
     </div>
 
     <!-- PINJAMAN -->
     <div id="formPinjaman" class="formBagian">
       <label>Pilih Peminjam</label>
-      <select id="peminjam">
-        <option value="Martunis">Pinjaman Martunis</option>
-        <option value="Muchsal">Pinjaman Muchsal</option>
-      </select>
+      <div class="customSelect">
+        <div class="customSelectBtn" onclick="csToggle('peminjam')">
+          <span id="peminjam_label">Pinjaman Martunis</span>
+          <svg class="csArrow" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1L7 7L13 1" stroke="#5f6b7a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="customSelectPanel" id="peminjam_panel">
+          <div class="customSelectItem terpilih" data-value="Martunis" onclick="csPilih('peminjam','Martunis','Pinjaman Martunis')">Pinjaman Martunis</div>
+          <div class="customSelectItem" data-value="Muchsal" onclick="csPilih('peminjam','Muchsal','Pinjaman Muchsal')">Pinjaman Muchsal</div>
+        </div>
+      </div>
+      <input type="hidden" id="peminjam" value="Martunis">
 
       <label>Deskripsi</label>
       <input id="deskripsiPinjaman" type="text" placeholder="Contoh: Pinjaman Tunai">
@@ -262,15 +345,22 @@
       <input id="hargaModal" type="number" min="0" placeholder="Contoh: 300000">
 
       <label>Satuan</label>
-      <select id="satuanModal">
-        <option value="ekor">Ekor</option>
-        <option value="zak">Zak</option>
-        <option value="btl">Botol</option>
-        <option value="ltr">Liter</option>
-        <option value="bln">Bulan</option>
-        <option value="kilo">Kilo</option>
-        <option value="pcs">Pcs</option>
-      </select>
+      <div class="customSelect">
+        <div class="customSelectBtn" onclick="csToggle('satuanModal')">
+          <span id="satuanModal_label">Ekor</span>
+          <svg class="csArrow" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1L7 7L13 1" stroke="#5f6b7a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="customSelectPanel" id="satuanModal_panel">
+          <div class="customSelectItem terpilih" data-value="ekor" onclick="csPilih('satuanModal','ekor','Ekor')">Ekor</div>
+          <div class="customSelectItem" data-value="zak" onclick="csPilih('satuanModal','zak','Zak')">Zak</div>
+          <div class="customSelectItem" data-value="btl" onclick="csPilih('satuanModal','btl','Botol')">Botol</div>
+          <div class="customSelectItem" data-value="ltr" onclick="csPilih('satuanModal','ltr','Liter')">Liter</div>
+          <div class="customSelectItem" data-value="bln" onclick="csPilih('satuanModal','bln','Bulan')">Bulan</div>
+          <div class="customSelectItem" data-value="kilo" onclick="csPilih('satuanModal','kilo','Kilo')">Kilo</div>
+          <div class="customSelectItem" data-value="pcs" onclick="csPilih('satuanModal','pcs','Pcs')">Pcs</div>
+        </div>
+      </div>
+      <input type="hidden" id="satuanModal" value="ekor">
 
       <label>Qty</label>
       <input id="qtyModal" type="number" step="0.01" min="0" placeholder="Contoh: 1">
@@ -326,13 +416,22 @@
     <h2>Lihat &amp; Kelola Data</h2>
 
     <label>Pilih Jenis Data</label>
-    <select id="jenisLihatData" onchange="muatDataUmum()">
-      <option value="penjualan">Penjualan</option>
-      <option value="pinjaman">Pinjaman</option>
-      <option value="modalBahan">Modal / Bahan Baku</option>
-      <option value="modalTambahan">Pengeluaran Tambahan</option>
-      <option value="stock">Data Stock</option>
-    </select>
+    <div class="customSelect">
+      <div class="customSelectBtn" onclick="csToggle('jenisLihatData')">
+        <span id="jenisLihatData_label">Penjualan</span>
+        <svg class="csArrow" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1L7 7L13 1" stroke="#5f6b7a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="customSelectPanel" id="jenisLihatData_panel">
+        <div class="customSelectItem terpilih" data-value="penjualan" onclick="csPilih('jenisLihatData','penjualan','Penjualan')">Penjualan</div>
+        <div class="customSelectItem" data-value="tester" onclick="csPilih('jenisLihatData','tester','Tester')">Tester</div>
+        <div class="customSelectItem" data-value="kematian" onclick="csPilih('jenisLihatData','kematian','Kematian')">Kematian</div>
+        <div class="customSelectItem" data-value="pinjaman" onclick="csPilih('jenisLihatData','pinjaman','Pinjaman')">Pinjaman</div>
+        <div class="customSelectItem" data-value="modalBahan" onclick="csPilih('jenisLihatData','modalBahan','Modal / Bahan Baku')">Modal / Bahan Baku</div>
+        <div class="customSelectItem" data-value="modalTambahan" onclick="csPilih('jenisLihatData','modalTambahan','Pengeluaran Tambahan')">Pengeluaran Tambahan</div>
+        <div class="customSelectItem" data-value="stock" onclick="csPilih('jenisLihatData','stock','Data Stock')">Data Stock</div>
+      </div>
+    </div>
+    <input type="hidden" id="jenisLihatData" value="penjualan">
 
     <div id="loadingLihatData" class="loading" style="margin-top:16px;">Memuat data...</div>
 
@@ -343,8 +442,10 @@
       </table>
     </div>
 
-    <button class="btnHijau menuButton" id="btnDownloadExcel" onclick="downloadExcel()" style="display:none;">⬇ Download Excel (.xlsx)</button>
-    <button class="btnOrange menuButton" id="btnDownloadPdf" onclick="downloadPdf()" style="display:none;">⬇ Download PDF</button>
+    <div class="buttonGrid">
+      <button class="btnHijau" id="btnDownloadExcel" onclick="downloadExcel()" style="display:none;">⬇ Excel</button>
+      <button class="btnOrange" id="btnDownloadPdf" onclick="downloadPdf()" style="display:none;">⬇ PDF</button>
+    </div>
 
     <button class="btnAbu menuButton" onclick="kembaliHome()">← Kembali ke Home</button>
   </div>
@@ -504,9 +605,52 @@ async function getSisaStock() {
 }
 
 document.getElementById('tanggalPenjualan').value = tanggalHariIni();
+document.getElementById('tanggalTester').value = tanggalHariIni();
+document.getElementById('tanggalKematian').value = tanggalHariIni();
 document.getElementById('tanggalPinjaman').value = tanggalHariIni();
 document.getElementById('tanggalTambahan').value = tanggalHariIni();
 document.getElementById('tanggalStock').value = tanggalHariIni();
+
+
+/* =====================================================
+   CUSTOM DROPDOWN (pengganti native select)
+===================================================== */
+function csToggle(id) {
+  const panel = document.getElementById(id + '_panel');
+  const tombol = panel.previousElementSibling;
+  const sedangAktif = panel.classList.contains('aktif');
+
+  document.querySelectorAll('.customSelectPanel.aktif').forEach(p => p.classList.remove('aktif'));
+  document.querySelectorAll('.customSelectBtn.terbuka').forEach(b => b.classList.remove('terbuka'));
+
+  if (!sedangAktif) {
+    panel.classList.add('aktif');
+    tombol.classList.add('terbuka');
+  }
+}
+
+function csPilih(id, value, label) {
+  document.getElementById(id).value = value;
+  document.getElementById(id + '_label').innerText = label;
+
+  const panel = document.getElementById(id + '_panel');
+  panel.classList.remove('aktif');
+  panel.previousElementSibling.classList.remove('terbuka');
+
+  panel.querySelectorAll('.customSelectItem').forEach(el => {
+    el.classList.toggle('terpilih', el.getAttribute('data-value') === value);
+  });
+
+  if (id === 'jenisData') ubahJenisData();
+  if (id === 'jenisLihatData') muatDataUmum();
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.customSelect')) {
+    document.querySelectorAll('.customSelectPanel.aktif').forEach(p => p.classList.remove('aktif'));
+    document.querySelectorAll('.customSelectBtn.terbuka').forEach(b => b.classList.remove('terbuka'));
+  }
+});
 
 
 /* =====================================================
@@ -546,6 +690,8 @@ function ubahJenisData() {
 
   const mapping = {
     penjualan: 'formPenjualan',
+    tester: 'formTester',
+    kematian: 'formKematian',
     pinjaman: 'formPinjaman',
     modalBahan: 'formModalBahan',
     modalTambahan: 'formModalTambahan'
@@ -553,33 +699,6 @@ function ubahJenisData() {
 
   document.getElementById(mapping[jenis]).classList.add('aktif');
   document.getElementById('pesan').innerText = '';
-}
-
-function ubahTujuanPenjualan() {
-  const tujuan = document.getElementById('tujuanPenjualan').value;
-  const namaItem = document.getElementById('namaItemPenjualan');
-  const customer = document.getElementById('dataCustomer');
-  const detail = document.getElementById('inputDetailPenjualan');
-
-  if (tujuan === 'Penjualan') {
-    namaItem.value = 'Penjualan Ikan Segar';
-    customer.style.display = 'block';
-    detail.style.display = 'block';
-  }
-  if (tujuan === 'Tester') {
-    namaItem.value = 'Tester Ikan';
-    customer.style.display = 'none';
-    detail.style.display = 'none';
-    document.getElementById('beratTimbangan').value = '';
-    document.getElementById('jumlahEkor').value = '';
-  }
-  if (tujuan === 'Kematian') {
-    namaItem.value = 'Ikan Mati';
-    customer.style.display = 'none';
-    detail.style.display = 'none';
-    document.getElementById('beratTimbangan').value = '';
-    document.getElementById('jumlahEkor').value = '';
-  }
 }
 
 
@@ -601,22 +720,15 @@ async function simpan() {
 
     if (jenis === 'penjualan') {
 
-      const tujuan = document.getElementById('tujuanPenjualan').value;
       const namaItem = document.getElementById('namaItemPenjualan').value;
       const tanggal = document.getElementById('tanggalPenjualan').value;
       const harga = document.getElementById('hargaPenjualan').value;
       const beratBayarInput = document.getElementById('beratBayar').value;
-
-      if (!namaItem || !tanggal || !harga || !beratBayarInput) {
-        tampilkanError('Mohon lengkapi data penjualan.');
-        return;
-      }
-
       const beratTimbanganInput = document.getElementById('beratTimbangan').value;
       const jumlahEkorInput = document.getElementById('jumlahEkor').value;
 
-      if (tujuan === 'Penjualan' && (!beratTimbanganInput || !jumlahEkorInput)) {
-        tampilkanError('Mohon isi Berat Timbangan dan Jumlah Ekor.');
+      if (!namaItem || !tanggal || !harga || !beratBayarInput || !beratTimbanganInput || !jumlahEkorInput) {
+        tampilkanError('Mohon lengkapi semua data penjualan.');
         return;
       }
 
@@ -624,8 +736,7 @@ async function simpan() {
       const beratBayarN = angka(beratBayarInput);
       const beratTimbanganN = angka(beratTimbanganInput);
       const jumlahEkorN = angka(jumlahEkorInput);
-      // Susut/shrinkage hanya berlaku untuk tujuan Penjualan (Tester/Kematian tidak punya berat timbangan terpisah)
-      const selisihBerat = (tujuan === 'Penjualan') ? (beratTimbanganN - beratBayarN) : null;
+      const selisihBerat = beratTimbanganN - beratBayarN;
       const subtotal = hargaN * beratBayarN;
 
       // ===== CEK SISA STOCK SEBELUM SIMPAN =====
@@ -638,25 +749,21 @@ async function simpan() {
         tampilkanError('Stock ikan habis (0 Kg). Silakan tambah stock terlebih dahulu sebelum menjual.');
         return;
       }
-
       if (beratBayarN > sisa.sisaKg) {
         tampilkanError('Berat melebihi sisa stock. Sisa stock saat ini hanya ' + formatAngka(sisa.sisaKg, 3) + ' Kg. Silakan tambah stock.');
         return;
       }
-
-      if (tujuan === 'Penjualan') {
-        if (sisa.sisaPcs <= 0) {
-          tampilkanError('Sisa ikan habis (0 Ekor). Silakan tambah stock terlebih dahulu sebelum menjual.');
-          return;
-        }
-        if (jumlahEkorN > sisa.sisaPcs) {
-          tampilkanError('Jumlah ekor melebihi sisa ikan. Sisa ikan saat ini hanya ' + formatAngka(sisa.sisaPcs, 0) + ' Ekor. Silakan tambah stock.');
-          return;
-        }
+      if (sisa.sisaPcs <= 0) {
+        tampilkanError('Sisa ikan habis (0 Ekor). Silakan tambah stock terlebih dahulu sebelum menjual.');
+        return;
+      }
+      if (jumlahEkorN > sisa.sisaPcs) {
+        tampilkanError('Jumlah ekor melebihi sisa ikan. Sisa ikan saat ini hanya ' + formatAngka(sisa.sisaPcs, 0) + ' Ekor. Silakan tambah stock.');
+        return;
       }
 
       const data = {
-        tujuan: tujuan,
+        tujuan: 'Penjualan',
         nama_item: namaItem,
         nama_customer: document.getElementById('namaCustomer').value || null,
         nomor_hp: document.getElementById('nomorHp').value || null,
@@ -680,6 +787,63 @@ async function simpan() {
       pesan.style.color = 'green';
       pesan.innerText = 'Data penjualan berhasil disimpan.';
       bersihkanForm('penjualan');
+
+    }
+
+    else if (jenis === 'tester' || jenis === 'kematian') {
+
+      const idTanggal = jenis === 'tester' ? 'tanggalTester' : 'tanggalKematian';
+      const idBerat = jenis === 'tester' ? 'beratTester' : 'beratKematian';
+      const labelJenis = jenis === 'tester' ? 'Tester' : 'Kematian';
+      const namaItem = jenis === 'tester' ? 'Tester Ikan' : 'Ikan Mati';
+
+      const tanggal = document.getElementById(idTanggal).value;
+      const beratInput = document.getElementById(idBerat).value;
+
+      if (!tanggal || !beratInput) {
+        tampilkanError('Mohon lengkapi data ' + labelJenis + '.');
+        return;
+      }
+
+      const beratN = angka(beratInput);
+
+      pesan.style.color = '#333';
+      pesan.innerText = 'Mengecek sisa stock...';
+
+      const sisa = await getSisaStock();
+
+      if (sisa.sisaKg <= 0) {
+        tampilkanError('Stock ikan habis (0 Kg). Silakan tambah stock terlebih dahulu.');
+        return;
+      }
+      if (beratN > sisa.sisaKg) {
+        tampilkanError('Berat melebihi sisa stock. Sisa stock saat ini hanya ' + formatAngka(sisa.sisaKg, 3) + ' Kg.');
+        return;
+      }
+
+      const data = {
+        tujuan: labelJenis,
+        nama_item: namaItem,
+        satuan: 'Kg',
+        tanggal: tanggal,
+        harga: 0,
+        berat_bayar: beratN,
+        berat_timbangan: null,
+        jumlah_ekor: null,
+        selisih_berat: null,
+        subtotal: 0
+      };
+
+      tombol.disabled = true;
+      tombol.innerText = 'Menyimpan...';
+      pesan.style.color = '#333';
+      pesan.innerText = 'Sedang menyimpan data...';
+
+      await sbInsert('penjualan', data);
+
+      pesan.style.color = 'green';
+      pesan.innerText = 'Data ' + labelJenis + ' berhasil disimpan.';
+      bersihkanForm(jenis);
 
     }
 
@@ -856,6 +1020,12 @@ function bersihkanForm(jenis) {
     document.getElementById('beratTimbangan').value = '';
     document.getElementById('jumlahEkor').value = '';
   }
+  if (jenis === 'tester') {
+    document.getElementById('beratTester').value = '';
+  }
+  if (jenis === 'kematian') {
+    document.getElementById('beratKematian').value = '';
+  }
   if (jenis === 'pinjaman') {
     document.getElementById('deskripsiPinjaman').value = '';
     document.getElementById('jumlahPinjaman').value = '';
@@ -941,16 +1111,36 @@ const KONFIG_TABEL = {
 
   penjualan: {
     table: 'penjualan',
-    query: '?select=*&order=id.asc',
-    kolom: ['No', 'Tanggal', 'Nama Item', 'Tujuan', 'Customer', 'No. HP', 'Berat Bayar', 'Berat Timbangan', 'Susut (Kg)', 'Jumlah Ekor', 'Subtotal'],
+    query: '?select=*&tujuan=eq.Penjualan&order=id.asc',
+    kolom: ['No', 'Tanggal', 'Nama Item', 'Customer', 'No. HP', 'Berat Bayar', 'Berat Timbangan', 'Susut (Kg)', 'Jumlah Ekor', 'Subtotal'],
     baris: (item, i) => {
       const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
       return [
-        i + 1, tanggal, item.nama_item || '-', item.tujuan || 'Penjualan', item.nama_customer || '-', item.nomor_hp || '-',
+        i + 1, tanggal, item.nama_item || '-', item.nama_customer || '-', item.nomor_hp || '-',
         formatAngka(item.berat_bayar, 3) + ' Kg', formatAngka(item.berat_timbangan, 3) + ' Kg',
         (item.selisih_berat !== null && item.selisih_berat !== undefined) ? formatAngka(item.selisih_berat, 3) + ' Kg' : '-',
         formatAngka(item.jumlah_ekor, 0), formatRupiah(item.subtotal)
       ];
+    }
+  },
+
+  tester: {
+    table: 'penjualan',
+    query: '?select=*&tujuan=eq.Tester&order=id.asc',
+    kolom: ['No', 'Tanggal', 'Berat (Kg)'],
+    baris: (item, i) => {
+      const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
+      return [i + 1, tanggal, formatAngka(item.berat_bayar, 3) + ' Kg'];
+    }
+  },
+
+  kematian: {
+    table: 'penjualan',
+    query: '?select=*&tujuan=eq.Kematian&order=id.asc',
+    kolom: ['No', 'Tanggal', 'Berat (Kg)'],
+    baris: (item, i) => {
+      const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
+      return [i + 1, tanggal, formatAngka(item.berat_bayar, 3) + ' Kg'];
     }
   },
 
@@ -1068,25 +1258,34 @@ async function hapusData(table, id) {
 ===================================================== */
 function downloadExcel() {
 
+  if (typeof XLSX === 'undefined') {
+    alert('Library Excel belum termuat. Pastikan koneksi internet aktif, lalu buka ulang aplikasi ini di browser (Chrome), bukan di preview Acode.');
+    return;
+  }
+
   if (!DATA_TERKINI.length) return;
 
-  const konfig = KONFIG_TABEL[JENIS_TERKINI];
+  try {
+    const konfig = KONFIG_TABEL[JENIS_TERKINI];
 
-  const rows = DATA_TERKINI.map((item, i) => {
-    const kolomBaris = konfig.baris(item, i);
-    const obj = {};
-    konfig.kolom.forEach((namaKolom, idx) => {
-      obj[namaKolom] = kolomBaris[idx];
+    const rows = DATA_TERKINI.map((item, i) => {
+      const kolomBaris = konfig.baris(item, i);
+      const obj = {};
+      konfig.kolom.forEach((namaKolom, idx) => {
+        obj[namaKolom] = kolomBaris[idx];
+      });
+      return obj;
     });
-    return obj;
-  });
 
-  const ws = XLSX.utils.json_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, JENIS_TERKINI);
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, JENIS_TERKINI);
 
-  const namaFile = JENIS_TERKINI + '_' + tanggalHariIni() + '.xlsx';
-  XLSX.writeFile(wb, namaFile);
+    const namaFile = JENIS_TERKINI + '_' + tanggalHariIni() + '.xlsx';
+    XLSX.writeFile(wb, namaFile);
+  } catch (err) {
+    alert('Gagal membuat file Excel: ' + err.message);
+  }
 }
 
 
@@ -1095,30 +1294,38 @@ function downloadExcel() {
 ===================================================== */
 function downloadPdf() {
 
+  if (typeof window.jspdf === 'undefined') {
+    alert('Library PDF belum termuat. Pastikan koneksi internet aktif, lalu buka ulang aplikasi ini di browser (Chrome), bukan di preview Acode.');
+    return;
+  }
+
   if (!DATA_TERKINI.length) return;
 
-  const konfig = KONFIG_TABEL[JENIS_TERKINI];
+  try {
+    const konfig = KONFIG_TABEL[JENIS_TERKINI];
+    const rows = DATA_TERKINI.map((item, i) => konfig.baris(item, i));
 
-  const rows = DATA_TERKINI.map((item, i) => konfig.baris(item, i));
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'landscape' });
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'landscape' });
+    doc.setFontSize(14);
+    doc.text('Catfish Management - ' + JENIS_TERKINI, 14, 15);
+    doc.setFontSize(9);
+    doc.text('Diunduh: ' + tanggalHariIni(), 14, 21);
 
-  doc.setFontSize(14);
-  doc.text('Catfish Management - ' + JENIS_TERKINI, 14, 15);
-  doc.setFontSize(9);
-  doc.text('Diunduh: ' + tanggalHariIni(), 14, 21);
+    doc.autoTable({
+      head: [konfig.kolom],
+      body: rows,
+      startY: 26,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [25, 118, 210] }
+    });
 
-  doc.autoTable({
-    head: [konfig.kolom],
-    body: rows,
-    startY: 26,
-    styles: { fontSize: 8 },
-    headStyles: { fillColor: [25, 118, 210] }
-  });
-
-  const namaFile = JENIS_TERKINI + '_' + tanggalHariIni() + '.pdf';
-  doc.save(namaFile);
+    const namaFile = JENIS_TERKINI + '_' + tanggalHariIni() + '.pdf';
+    doc.save(namaFile);
+  } catch (err) {
+    alert('Gagal membuat file PDF: ' + err.message);
+  }
 }
 
 
@@ -1174,7 +1381,6 @@ async function muatKeuntungan() {
 /* =====================================================
    JALANKAN SAAT WEB DIBUKA
 ===================================================== */
-ubahTujuanPenjualan();
 muatDashboard();
 
 </script>
