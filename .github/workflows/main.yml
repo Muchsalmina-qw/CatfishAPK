@@ -31,6 +31,11 @@ jobs:
       - name: Add Android platform
         run: npx cordova platform add android
 
+      - name: Remove Cordova Splash Icon
+        run: |
+          sed -i '/windowSplashScreenAnimatedIcon/d' platforms/android/app/src/main/res/values/themes.xml || true
+          sed -i 's/Theme.SplashScreen.IconBackground/Theme.SplashScreen/g' platforms/android/app/src/main/res/values/themes.xml || true
+
       - name: Build Android APK
         run: npx cordova build android --debug
 
