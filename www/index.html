@@ -123,6 +123,30 @@
   .customSelectItem:active { background: #f1f4f8; }
   .customSelectItem.terpilih { background: #e8f0fe; color: #1976d2; font-weight: bold; }
 
+  /* ===== DATA CARD (pengganti tabel lebar untuk mobile) ===== */
+  .dataCard {
+    background: #fafbfc; border: 1px solid #e8ebee; border-radius: 12px;
+    padding: 14px; margin-bottom: 10px;
+  }
+  .dataCardTop {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e8ebee;
+  }
+  .noBadge {
+    background: #1976d2; color: white; font-size: 12px; font-weight: bold;
+    border-radius: 6px; padding: 3px 9px;
+  }
+  .dataRow { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; padding: 3px 0; }
+  .dataRow .labelKolom { color: #6b7280; flex-shrink: 0; }
+  .dataRow .valueKolom { font-weight: 600; text-align: right; color: #202124; }
+
+  .totalCard {
+    background: #eaf2fc; border: 1px solid #cfe0f3; border-radius: 12px;
+    padding: 14px; margin-top: 6px;
+  }
+  .totalCard .totalTitle { font-weight: bold; color: #1976d2; margin-bottom: 6px; font-size: 14px; }
+  .totalCard .valueKolom { color: #1976d2; }
+
   .formBagian { display: none; }
   .formBagian.aktif { display: block; }
 
@@ -233,7 +257,9 @@
       <button class="btnBiru" onclick="bukaInput()">+ Input Data</button>
       <button class="btnHijau" onclick="bukaLihatData()">Lihat &amp; Kelola Data</button>
       <button class="btnOrange" onclick="bukaKeuntungan()">Lihat Keuntungan</button>
-      <button class="btnUngu" onclick="bukaInputStock()">Tambah Stock</button>
+      <button class="btnUngu" onclick="bukaInputStock()">Kelola Stock Ikan</button>
+      <button class="btnDashboard" onclick="bukaInputPakan()">Stock Pakan</button>
+      <button class="btnDashboard" onclick="bukaPemberianPakan()">Pemberian Pakan</button>
     </div>
   </div>
 
@@ -258,8 +284,6 @@
         <div class="customSelectItem" data-value="pinjaman" onclick="csPilih('jenisData','pinjaman','Pinjaman')">Pinjaman</div>
         <div class="customSelectItem" data-value="modalBahan" onclick="csPilih('jenisData','modalBahan','Modal / Bahan Baku')">Modal / Bahan Baku</div>
         <div class="customSelectItem" data-value="modalTambahan" onclick="csPilih('jenisData','modalTambahan','Pengeluaran Tambahan')">Pengeluaran Tambahan</div>
-        <div class="customSelectItem" data-value="tambahStockPakan" onclick="csPilih('jenisData','tambahStockPakan','Tambah Stock Pakan')">Tambah Stock Pakan</div>
-        <div class="customSelectItem" data-value="pemberianPakan" onclick="csPilih('jenisData','pemberianPakan','Pemberian Pakan')">Pemberian Pakan</div>
       </div>
     </div>
     <input type="hidden" id="jenisData" value="penjualan">
@@ -395,28 +419,6 @@
       <input id="jumlahTambahan" type="number" min="0" placeholder="Contoh: 20000">
     </div>
 
-    <!-- TAMBAH STOCK PAKAN -->
-    <div id="formTambahStockPakan" class="formBagian">
-      <label>Tanggal</label>
-      <input id="tanggalStockPakan" type="date">
-
-      <label>Jumlah Pakan Ditambahkan (Kg)</label>
-      <input id="jumlahStockPakan" type="text" inputmode="decimal" placeholder="Contoh: 25 atau 25,5">
-
-      <label>Keterangan (Opsional)</label>
-      <input id="keteranganStockPakan" type="text" placeholder="Contoh: Pelet 781-2">
-    </div>
-
-    <!-- PEMBERIAN PAKAN -->
-    <div id="formPemberianPakan" class="formBagian">
-      <label>Tanggal</label>
-      <input id="tanggalPemberianPakan" type="date">
-
-      <label>Jumlah Pakan Diberikan (Kg)</label>
-      <input id="jumlahPemberianPakan" type="text" inputmode="decimal" placeholder="Contoh: 5 atau 5,5">
-      <div class="keterangan">Akan mengurangi sisa stock pakan.</div>
-    </div>
-
     <button id="tombolSimpan" class="btnBiru tombolSimpan" onclick="simpan()">Simpan Data</button>
     <div id="pesan"></div>
 
@@ -429,20 +431,97 @@
 <!-- ===================== INPUT STOCK ===================== -->
 <div id="halamanStock" class="halaman">
   <div class="card">
-    <h2>Tambah Stock</h2>
-    <div class="keterangan" style="margin-bottom:10px;">Jumlah di sini akan <strong>ditambahkan</strong> ke stock yang ada, bukan menggantikan angka sebelumnya.</div>
+    <h2>Kelola Stock Ikan</h2>
 
-    <label>Tanggal Tambah Stock</label>
+    <label>Jenis Transaksi</label>
+    <div class="customSelect">
+      <div class="customSelectBtn" onclick="csToggle('jenisTransaksiStock')">
+        <span id="jenisTransaksiStock_label">Tambah Stock</span>
+        <svg class="csArrow" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1L7 7L13 1" stroke="#5f6b7a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="customSelectPanel" id="jenisTransaksiStock_panel">
+        <div class="customSelectItem terpilih" data-value="tambah" onclick="csPilih('jenisTransaksiStock','tambah','Tambah Stock')">Tambah Stock</div>
+        <div class="customSelectItem" data-value="kurang" onclick="csPilih('jenisTransaksiStock','kurang','Kurangi Stock')">Kurangi Stock</div>
+      </div>
+    </div>
+    <input type="hidden" id="jenisTransaksiStock" value="tambah">
+
+    <div class="keterangan" id="keteranganModeStock" style="margin:10px 0;">Jumlah di sini akan <strong>ditambahkan</strong> ke stock yang ada.</div>
+
+    <label>Tanggal</label>
     <input id="tanggalStock" type="date">
 
-    <label>Jumlah Ikan / Pcs yang Ditambahkan</label>
+    <label id="labelJumlahPcsStock">Jumlah Ikan / Pcs yang Ditambahkan</label>
     <input id="jumlahPcsStock" type="number" min="0" step="1" placeholder="Contoh: 900">
 
-    <label>Berat Total yang Ditambahkan (Kg)</label>
+    <label id="labelUomStock">Berat Total yang Ditambahkan (Kg)</label>
     <input id="uomStock" type="text" inputmode="decimal" placeholder="Contoh: 95.5">
+
+    <label>Keterangan (Opsional)</label>
+    <input id="keteranganStock" type="text" placeholder="Contoh: Restock dari supplier / Koreksi data">
 
     <button id="tombolStock" class="btnUngu tombolSimpan" onclick="simpanDataStock()">Simpan Data Stock</button>
     <div id="pesanStock"></div>
+
+    <button class="btnAbu menuButton" onclick="kembaliHome()">← Kembali ke Home</button>
+  </div>
+</div>
+
+
+<!-- ===================== STOCK PAKAN (Tambah/Kurangi) ===================== -->
+<div id="halamanPakan" class="halaman">
+  <div class="card">
+    <h2>Kelola Stock Pakan</h2>
+
+    <label>Jenis Transaksi</label>
+    <div class="customSelect">
+      <div class="customSelectBtn" onclick="csToggle('jenisTransaksiPakan')">
+        <span id="jenisTransaksiPakan_label">Tambah Stock Pakan</span>
+        <svg class="csArrow" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1L7 7L13 1" stroke="#5f6b7a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="customSelectPanel" id="jenisTransaksiPakan_panel">
+        <div class="customSelectItem terpilih" data-value="tambah" onclick="csPilih('jenisTransaksiPakan','tambah','Tambah Stock Pakan')">Tambah Stock Pakan</div>
+        <div class="customSelectItem" data-value="kurang" onclick="csPilih('jenisTransaksiPakan','kurang','Kurangi Stock Pakan')">Kurangi Stock Pakan</div>
+      </div>
+    </div>
+    <input type="hidden" id="jenisTransaksiPakan" value="tambah">
+
+    <div class="keterangan" id="keteranganModePakan" style="margin:10px 0;">Jumlah di sini akan <strong>ditambahkan</strong> ke stock pakan yang ada.</div>
+
+    <label>Tanggal</label>
+    <input id="tanggalPakan" type="date">
+
+    <label id="labelJumlahPakan">Jumlah Pakan Ditambahkan (Kg)</label>
+    <input id="jumlahPakan" type="text" inputmode="decimal" placeholder="Contoh: 25 atau 25,5">
+
+    <label>Keterangan (Opsional)</label>
+    <input id="keteranganPakan" type="text" placeholder="Contoh: Pelet 781-2">
+
+    <button id="tombolPakan" class="btnHijau tombolSimpan" onclick="simpanDataPakan()">Simpan Stock Pakan</button>
+    <div id="pesanPakan"></div>
+
+    <button class="btnAbu menuButton" onclick="kembaliHome()">← Kembali ke Home</button>
+  </div>
+</div>
+
+
+<!-- ===================== PEMBERIAN PAKAN (terpisah) ===================== -->
+<div id="halamanPemberianPakan" class="halaman">
+  <div class="card">
+    <h2>Pemberian Pakan</h2>
+    <div class="keterangan" style="margin-bottom:10px;">Jumlah di sini akan <strong>mengurangi</strong> stock pakan karena diberikan ke ikan.</div>
+
+    <label>Tanggal</label>
+    <input id="tanggalPemberianPakan" type="date">
+
+    <label>Jumlah Pakan yang Diberikan (Kg)</label>
+    <input id="jumlahPemberianPakan" type="text" inputmode="decimal" placeholder="Contoh: 5 atau 5,5">
+
+    <label>Keterangan (Opsional)</label>
+    <input id="keteranganPemberianPakan" type="text" placeholder="Contoh: Pemberian pagi">
+
+    <button id="tombolPemberianPakan" class="btnUngu tombolSimpan" onclick="simpanPemberianPakan()">Simpan Pemberian Pakan</button>
+    <div id="pesanPemberianPakan"></div>
 
     <button class="btnAbu menuButton" onclick="kembaliHome()">← Kembali ke Home</button>
   </div>
@@ -476,11 +555,9 @@
 
     <div id="loadingLihatData" class="loading" style="margin-top:16px;">Memuat data...</div>
 
-    <div class="tableWrapper" id="wrapperTabelLihatData" style="display:none; margin-top:16px;">
-      <table>
-        <thead id="theadLihatData"></thead>
-        <tbody id="isiTabelLihatData"></tbody>
-      </table>
+    <div id="wrapperTabelLihatData" style="display:none; margin-top:16px;">
+      <div id="isiTabelLihatData"></div>
+      <div id="totalLihatData"></div>
     </div>
 
     <div class="buttonGrid">
@@ -692,7 +769,7 @@ document.getElementById('tanggalKematian').value = tanggalHariIni();
 document.getElementById('tanggalPinjaman').value = tanggalHariIni();
 document.getElementById('tanggalTambahan').value = tanggalHariIni();
 document.getElementById('tanggalStock').value = tanggalHariIni();
-document.getElementById('tanggalStockPakan').value = tanggalHariIni();
+document.getElementById('tanggalPakan').value = tanggalHariIni();
 document.getElementById('tanggalPemberianPakan').value = tanggalHariIni();
 
 
@@ -727,6 +804,8 @@ function csPilih(id, value, label) {
 
   if (id === 'jenisData') ubahJenisData();
   if (id === 'jenisLihatData') muatDataUmum();
+  if (id === 'jenisTransaksiStock') ubahJenisTransaksiStock();
+  if (id === 'jenisTransaksiPakan') ubahJenisTransaksiPakan();
 }
 
 document.addEventListener('click', function(e) {
@@ -753,6 +832,30 @@ function kembaliHome() {
 
 function bukaInput() { tampilkanHalaman('halamanInput'); }
 function bukaInputStock() { tampilkanHalaman('halamanStock'); }
+function bukaInputPakan() { tampilkanHalaman('halamanPakan'); }
+function bukaPemberianPakan() { tampilkanHalaman('halamanPemberianPakan'); }
+
+function ubahJenisTransaksiStock() {
+  const mode = document.getElementById('jenisTransaksiStock').value;
+  const keterangan = document.getElementById('keteranganModeStock');
+  const labelPcs = document.getElementById('labelJumlahPcsStock');
+  const labelUom = document.getElementById('labelUomStock');
+  const tombol = document.getElementById('tombolStock');
+
+  if (mode === 'tambah') {
+    keterangan.innerHTML = 'Jumlah di sini akan <strong>ditambahkan</strong> ke stock yang ada.';
+    labelPcs.innerText = 'Jumlah Ikan / Pcs yang Ditambahkan';
+    labelUom.innerText = 'Berat Total yang Ditambahkan (Kg)';
+    tombol.className = 'btnUngu tombolSimpan';
+    tombol.innerText = 'Simpan Data Stock';
+  } else {
+    keterangan.innerHTML = 'Jumlah di sini akan <strong>mengurangi</strong> stock yang ada (misal koreksi data atau ikan hilang tak tercatat).';
+    labelPcs.innerText = 'Jumlah Ikan / Pcs yang Dikurangi';
+    labelUom.innerText = 'Berat Total yang Dikurangi (Kg)';
+    tombol.className = 'btnOrange tombolSimpan';
+    tombol.innerText = 'Simpan Pengurangan Stock';
+  }
+}
 
 function bukaLihatData() {
   tampilkanHalaman('halamanLihatData');
@@ -778,9 +881,7 @@ function ubahJenisData() {
     kematian: 'formKematian',
     pinjaman: 'formPinjaman',
     modalBahan: 'formModalBahan',
-    modalTambahan: 'formModalTambahan',
-    tambahStockPakan: 'formTambahStockPakan',
-    pemberianPakan: 'formPemberianPakan'
+    modalTambahan: 'formModalTambahan'
   };
 
   document.getElementById(mapping[jenis]).classList.add('aktif');
@@ -1034,80 +1135,6 @@ async function simpan() {
 
     }
 
-    else if (jenis === 'tambahStockPakan') {
-
-      const tanggal = document.getElementById('tanggalStockPakan').value;
-      const jumlahInput = document.getElementById('jumlahStockPakan').value;
-      const keterangan = document.getElementById('keteranganStockPakan').value;
-
-      if (!tanggal || !jumlahInput) {
-        tampilkanError('Mohon lengkapi data stock pakan.');
-        return;
-      }
-
-      const data = {
-        tanggal: tanggal,
-        jumlah_kg: angka(jumlahInput),
-        keterangan: keterangan || null
-      };
-
-      tombol.disabled = true;
-      tombol.innerText = 'Menyimpan...';
-      pesan.style.color = '#333';
-      pesan.innerText = 'Sedang menyimpan data...';
-
-      await sbInsert('pakan_stock', data);
-
-      pesan.style.color = 'green';
-      pesan.innerText = 'Stock pakan berhasil ditambahkan.';
-      bersihkanForm('tambahStockPakan');
-
-    }
-
-    else if (jenis === 'pemberianPakan') {
-
-      const tanggal = document.getElementById('tanggalPemberianPakan').value;
-      const jumlahInput = document.getElementById('jumlahPemberianPakan').value;
-
-      if (!tanggal || !jumlahInput) {
-        tampilkanError('Mohon lengkapi data pemberian pakan.');
-        return;
-      }
-
-      const jumlahN = angka(jumlahInput);
-
-      pesan.style.color = '#333';
-      pesan.innerText = 'Mengecek sisa pakan...';
-
-      const sisaPakan = await getSisaPakan();
-
-      if (sisaPakan <= 0) {
-        tampilkanError('Stock pakan habis (0 Kg). Silakan tambah stock pakan terlebih dahulu.');
-        return;
-      }
-      if (jumlahN > sisaPakan) {
-        tampilkanError('Jumlah pakan melebihi sisa stock. Sisa pakan saat ini hanya ' + formatAngka(sisaPakan, 3) + ' Kg.');
-        return;
-      }
-
-      const data = {
-        tanggal: tanggal,
-        jumlah_kg: jumlahN
-      };
-
-      tombol.disabled = true;
-      tombol.innerText = 'Menyimpan...';
-      pesan.style.color = '#333';
-      pesan.innerText = 'Sedang menyimpan data...';
-
-      await sbInsert('pakan_pemberian', data);
-
-      pesan.style.color = 'green';
-      pesan.innerText = 'Pemberian pakan berhasil dicatat.';
-      bersihkanForm('pemberianPakan');
-
-    }
-
   } catch (err) {
     pesan.style.color = 'red';
     pesan.innerText = 'Gagal: ' + err.message;
@@ -1125,10 +1152,12 @@ async function simpanDataStock() {
 
   const tombol = document.getElementById('tombolStock');
   const pesan = document.getElementById('pesanStock');
+  const mode = document.getElementById('jenisTransaksiStock').value;
 
   const tanggal = document.getElementById('tanggalStock').value;
   const jumlahPcsInput = document.getElementById('jumlahPcsStock').value;
   const uomInput = document.getElementById('uomStock').value;
+  const keteranganInput = document.getElementById('keteranganStock').value;
 
   if (!tanggal || !jumlahPcsInput || !uomInput) {
     pesan.style.color = 'red';
@@ -1141,30 +1170,225 @@ async function simpanDataStock() {
 
   try {
 
-    const jumlahPcs = angka(jumlahPcsInput);
-    const uom = angka(uomInput);
+    let jumlahPcs = angka(jumlahPcsInput);
+    let uom = angka(uomInput);
+
+    if (mode === 'kurang') {
+
+      pesan.style.color = '#333';
+      pesan.innerText = 'Mengecek sisa stock...';
+
+      const sisa = await getSisaStock();
+
+      if (jumlahPcs > sisa.sisaPcs) {
+        pesan.style.color = 'red';
+        pesan.innerText = 'Jumlah pengurangan ekor melebihi sisa stock saat ini (' + formatAngka(sisa.sisaPcs, 0) + ' Ekor).';
+        tombol.disabled = false;
+        tombol.innerText = 'Simpan Pengurangan Stock';
+        return;
+      }
+      if (uom > sisa.sisaKg) {
+        pesan.style.color = 'red';
+        pesan.innerText = 'Jumlah pengurangan berat melebihi sisa stock saat ini (' + formatAngka(sisa.sisaKg, 3) + ' Kg).';
+        tombol.disabled = false;
+        tombol.innerText = 'Simpan Pengurangan Stock';
+        return;
+      }
+
+      // Jadikan negatif supaya mengurangi total saat dijumlahkan
+      jumlahPcs = -jumlahPcs;
+      uom = -uom;
+    }
 
     const data = {
       tanggal: tanggal,
       jumlah_pcs: jumlahPcs,
       uom: uom,
-      stock_minus: null
+      stock_minus: null,
+      keterangan: keteranganInput || null
     };
+
+    pesan.style.color = '#333';
+    pesan.innerText = 'Sedang menyimpan data...';
 
     await sbInsert('stock', data);
 
     pesan.style.color = 'green';
-    pesan.innerText = 'Stock berhasil ditambahkan.';
+    pesan.innerText = (mode === 'tambah') ? 'Stock berhasil ditambahkan.' : 'Pengurangan stock berhasil dicatat.';
 
     document.getElementById('jumlahPcsStock').value = '';
     document.getElementById('uomStock').value = '';
+    document.getElementById('keteranganStock').value = '';
 
   } catch (err) {
     pesan.style.color = 'red';
     pesan.innerText = 'Gagal: ' + err.message;
   } finally {
     tombol.disabled = false;
-    tombol.innerText = 'Simpan Data Stock';
+    tombol.innerText = (mode === 'tambah') ? 'Simpan Data Stock' : 'Simpan Pengurangan Stock';
+  }
+}
+
+
+/* =====================================================
+   KELOLA PAKAN (Tambah / Kurangi / Pemberian)
+===================================================== */
+function ubahJenisTransaksiPakan() {
+  const mode = document.getElementById('jenisTransaksiPakan').value;
+  const keterangan = document.getElementById('keteranganModePakan');
+  const labelJumlah = document.getElementById('labelJumlahPakan');
+  const tombol = document.getElementById('tombolPakan');
+
+  if (mode === 'tambah') {
+    keterangan.innerHTML = 'Jumlah di sini akan <strong>ditambahkan</strong> ke stock pakan yang ada.';
+    labelJumlah.innerText = 'Jumlah Pakan Ditambahkan (Kg)';
+    tombol.className = 'btnHijau tombolSimpan';
+    tombol.innerText = 'Simpan Stock Pakan';
+  } else {
+    keterangan.innerHTML = 'Jumlah di sini akan <strong>mengurangi</strong> stock pakan (misal pakan rusak/basah, koreksi data).';
+    labelJumlah.innerText = 'Jumlah Pakan yang Dikurangi (Kg)';
+    tombol.className = 'btnOrange tombolSimpan';
+    tombol.innerText = 'Simpan Pengurangan Pakan';
+  }
+}
+
+async function simpanDataPakan() {
+
+  const tombol = document.getElementById('tombolPakan');
+  const pesan = document.getElementById('pesanPakan');
+  const mode = document.getElementById('jenisTransaksiPakan').value;
+
+  const tanggal = document.getElementById('tanggalPakan').value;
+  const jumlahInput = document.getElementById('jumlahPakan').value;
+  const keteranganInput = document.getElementById('keteranganPakan').value;
+
+  if (!tanggal || !jumlahInput) {
+    pesan.style.color = 'red';
+    pesan.innerText = 'Mohon lengkapi semua data pakan.';
+    return;
+  }
+
+  const jumlahN = angka(jumlahInput);
+
+  tombol.disabled = true;
+  tombol.innerText = 'Menyimpan...';
+
+  try {
+
+    if (mode === 'tambah') {
+
+      await sbInsert('pakan_stock', {
+        tanggal: tanggal,
+        jumlah_kg: jumlahN,
+        keterangan: keteranganInput || null
+      });
+
+      pesan.style.color = 'green';
+      pesan.innerText = 'Stock pakan berhasil ditambahkan.';
+
+    } else {
+
+      pesan.style.color = '#333';
+      pesan.innerText = 'Mengecek sisa pakan...';
+
+      const sisaPakan = await getSisaPakan();
+
+      if (jumlahN > sisaPakan) {
+        pesan.style.color = 'red';
+        pesan.innerText = 'Jumlah pengurangan melebihi sisa pakan saat ini (' + formatAngka(sisaPakan, 3) + ' Kg).';
+        tombol.disabled = false;
+        tombol.innerText = 'Simpan Pengurangan Pakan';
+        return;
+      }
+
+      await sbInsert('pakan_stock', {
+        tanggal: tanggal,
+        jumlah_kg: -jumlahN,
+        keterangan: keteranganInput || null
+      });
+
+      pesan.style.color = 'green';
+      pesan.innerText = 'Pengurangan stock pakan berhasil dicatat.';
+
+    }
+
+    document.getElementById('jumlahPakan').value = '';
+    document.getElementById('keteranganPakan').value = '';
+
+  } catch (err) {
+    pesan.style.color = 'red';
+    pesan.innerText = 'Gagal: ' + err.message;
+  } finally {
+    tombol.disabled = false;
+    tombol.innerText = (mode === 'tambah') ? 'Simpan Stock Pakan' : 'Simpan Pengurangan Pakan';
+  }
+}
+
+
+/* =====================================================
+   PEMBERIAN PAKAN (terpisah dari Stock Pakan)
+===================================================== */
+async function simpanPemberianPakan() {
+
+  const tombol = document.getElementById('tombolPemberianPakan');
+  const pesan = document.getElementById('pesanPemberianPakan');
+
+  const tanggal = document.getElementById('tanggalPemberianPakan').value;
+  const jumlahInput = document.getElementById('jumlahPemberianPakan').value;
+  const keteranganInput = document.getElementById('keteranganPemberianPakan').value;
+
+  if (!tanggal || !jumlahInput) {
+    pesan.style.color = 'red';
+    pesan.innerText = 'Mohon lengkapi semua data pemberian pakan.';
+    return;
+  }
+
+  const jumlahN = angka(jumlahInput);
+
+  tombol.disabled = true;
+  tombol.innerText = 'Menyimpan...';
+  pesan.style.color = '#333';
+  pesan.innerText = 'Mengecek sisa pakan...';
+
+  try {
+
+    const sisaPakan = await getSisaPakan();
+
+    if (sisaPakan <= 0) {
+      pesan.style.color = 'red';
+      pesan.innerText = 'Stock pakan habis (0 Kg). Silakan tambah stock pakan terlebih dahulu.';
+      tombol.disabled = false;
+      tombol.innerText = 'Simpan Pemberian Pakan';
+      return;
+    }
+    if (jumlahN > sisaPakan) {
+      pesan.style.color = 'red';
+      pesan.innerText = 'Jumlah pakan melebihi sisa stock. Sisa pakan saat ini hanya ' + formatAngka(sisaPakan, 3) + ' Kg.';
+      tombol.disabled = false;
+      tombol.innerText = 'Simpan Pemberian Pakan';
+      return;
+    }
+
+    pesan.innerText = 'Sedang menyimpan data...';
+
+    await sbInsert('pakan_pemberian', {
+      tanggal: tanggal,
+      jumlah_kg: jumlahN,
+      keterangan: keteranganInput || null
+    });
+
+    pesan.style.color = 'green';
+    pesan.innerText = 'Pemberian pakan berhasil dicatat.';
+
+    document.getElementById('jumlahPemberianPakan').value = '';
+    document.getElementById('keteranganPemberianPakan').value = '';
+
+  } catch (err) {
+    pesan.style.color = 'red';
+    pesan.innerText = 'Gagal: ' + err.message;
+  } finally {
+    tombol.disabled = false;
+    tombol.innerText = 'Simpan Pemberian Pakan';
   }
 }
 
@@ -1198,13 +1422,6 @@ function bersihkanForm(jenis) {
   if (jenis === 'modalTambahan') {
     document.getElementById('deskripsiTambahan').value = '';
     document.getElementById('jumlahTambahan').value = '';
-  }
-  if (jenis === 'tambahStockPakan') {
-    document.getElementById('jumlahStockPakan').value = '';
-    document.getElementById('keteranganStockPakan').value = '';
-  }
-  if (jenis === 'pemberianPakan') {
-    document.getElementById('jumlahPemberianPakan').value = '';
   }
 }
 
@@ -1296,6 +1513,16 @@ const KONFIG_TABEL = {
         (item.selisih_berat !== null && item.selisih_berat !== undefined) ? formatAngka(item.selisih_berat, 3) + ' Kg' : '-',
         formatAngka(item.jumlah_ekor, 0), formatRupiah(item.subtotal)
       ];
+    },
+    totalBaris: (data) => {
+      let totalBerat = 0, totalSusut = 0, totalEkor = 0, totalSubtotal = 0;
+      data.forEach(item => {
+        totalBerat += angka(item.berat_bayar);
+        totalSusut += angka(item.selisih_berat);
+        totalEkor += angka(item.jumlah_ekor);
+        totalSubtotal += angka(item.subtotal);
+      });
+      return ['TOTAL', '', '', '', '', formatAngka(totalBerat, 3) + ' Kg', '', formatAngka(totalSusut, 3) + ' Kg', formatAngka(totalEkor, 0), formatRupiah(totalSubtotal)];
     }
   },
 
@@ -1306,6 +1533,11 @@ const KONFIG_TABEL = {
     baris: (item, i) => {
       const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
       return [i + 1, tanggal, formatAngka(item.berat_bayar, 3) + ' Kg'];
+    },
+    totalBaris: (data) => {
+      let total = 0;
+      data.forEach(item => total += angka(item.berat_bayar));
+      return ['TOTAL', '', formatAngka(total, 3) + ' Kg'];
     }
   },
 
@@ -1316,6 +1548,11 @@ const KONFIG_TABEL = {
     baris: (item, i) => {
       const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
       return [i + 1, tanggal, formatAngka(item.berat_bayar, 3) + ' Kg'];
+    },
+    totalBaris: (data) => {
+      let total = 0;
+      data.forEach(item => total += angka(item.berat_bayar));
+      return ['TOTAL', '', formatAngka(total, 3) + ' Kg'];
     }
   },
 
@@ -1326,6 +1563,11 @@ const KONFIG_TABEL = {
     baris: (item, i) => {
       const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
       return [i + 1, item.peminjam, item.deskripsi, tanggal, formatRupiah(item.jumlah)];
+    },
+    totalBaris: (data) => {
+      let total = 0;
+      data.forEach(item => total += angka(item.jumlah));
+      return ['TOTAL', '', '', '', formatRupiah(total)];
     }
   },
 
@@ -1335,6 +1577,11 @@ const KONFIG_TABEL = {
     kolom: ['No', 'Deskripsi', 'Harga', 'Satuan', 'Qty', 'Subtotal'],
     baris: (item, i) => {
       return [i + 1, item.deskripsi, formatRupiah(item.harga), item.satuan || '-', formatAngka(item.qty, 2), formatRupiah(item.subtotal)];
+    },
+    totalBaris: (data) => {
+      let total = 0;
+      data.forEach(item => total += angka(item.subtotal));
+      return ['TOTAL', '', '', '', '', formatRupiah(total)];
     }
   },
 
@@ -1345,36 +1592,61 @@ const KONFIG_TABEL = {
     baris: (item, i) => {
       const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
       return [i + 1, item.deskripsi, tanggal, formatRupiah(item.subtotal)];
+    },
+    totalBaris: (data) => {
+      let total = 0;
+      data.forEach(item => total += angka(item.subtotal));
+      return ['TOTAL', '', '', formatRupiah(total)];
     }
   },
 
   stock: {
     table: 'stock',
     query: '?select=*&order=id.asc',
-    kolom: ['No', 'Tanggal', 'Jumlah Pcs', 'UOM (Kg)', 'Stock Minus'],
+    kolom: ['No', 'Tanggal', 'Jenis', 'Jumlah Pcs', 'Berat (Kg)', 'Keterangan'],
     baris: (item, i) => {
       const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
-      return [i + 1, tanggal, formatAngka(item.jumlah_pcs, 0), formatAngka(item.uom, 3), formatAngka(item.stock_minus, 3)];
+      const pcs = angka(item.jumlah_pcs);
+      const kg = angka(item.uom);
+      const jenis = (pcs < 0 || kg < 0) ? 'Kurangi' : 'Tambah';
+      return [i + 1, tanggal, jenis, formatAngka(Math.abs(pcs), 0), formatAngka(Math.abs(kg), 3) + ' Kg', item.keterangan || '-'];
+    },
+    totalBaris: (data) => {
+      let totalPcs = 0, totalKg = 0;
+      data.forEach(item => { totalPcs += angka(item.jumlah_pcs); totalKg += angka(item.uom); });
+      return ['TOTAL (Net)', '', '', formatAngka(totalPcs, 0), formatAngka(totalKg, 3) + ' Kg', ''];
     }
   },
 
   stockPakan: {
     table: 'pakan_stock',
     query: '?select=*&order=id.asc',
-    kolom: ['No', 'Tanggal', 'Jumlah (Kg)', 'Keterangan'],
+    kolom: ['No', 'Tanggal', 'Jenis', 'Jumlah (Kg)', 'Keterangan'],
     baris: (item, i) => {
       const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
-      return [i + 1, tanggal, formatAngka(item.jumlah_kg, 3) + ' Kg', item.keterangan || '-'];
+      const jumlah = angka(item.jumlah_kg);
+      const jenis = jumlah < 0 ? 'Kurangi' : 'Tambah';
+      return [i + 1, tanggal, jenis, formatAngka(Math.abs(jumlah), 3) + ' Kg', item.keterangan || '-'];
+    },
+    totalBaris: (data) => {
+      let total = 0;
+      data.forEach(item => total += angka(item.jumlah_kg));
+      return ['TOTAL (Net)', '', '', formatAngka(total, 3) + ' Kg', ''];
     }
   },
 
   pemberianPakan: {
     table: 'pakan_pemberian',
     query: '?select=*&order=id.asc',
-    kolom: ['No', 'Tanggal', 'Jumlah (Kg)'],
+    kolom: ['No', 'Tanggal', 'Jumlah (Kg)', 'Keterangan'],
     baris: (item, i) => {
       const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
-      return [i + 1, tanggal, formatAngka(item.jumlah_kg, 3) + ' Kg'];
+      return [i + 1, tanggal, formatAngka(item.jumlah_kg, 3) + ' Kg', item.keterangan || '-'];
+    },
+    totalBaris: (data) => {
+      let total = 0;
+      data.forEach(item => total += angka(item.jumlah_kg));
+      return ['TOTAL', '', formatAngka(total, 3) + ' Kg', ''];
     }
   }
 
@@ -1387,8 +1659,8 @@ async function muatDataUmum() {
 
   const loading = document.getElementById('loadingLihatData');
   const wrapper = document.getElementById('wrapperTabelLihatData');
-  const thead = document.getElementById('theadLihatData');
-  const tbody = document.getElementById('isiTabelLihatData');
+  const isi = document.getElementById('isiTabelLihatData');
+  const totalWrap = document.getElementById('totalLihatData');
   const btnExcel = document.getElementById('btnDownloadExcel');
   const btnPdf = document.getElementById('btnDownloadPdf');
 
@@ -1405,20 +1677,42 @@ async function muatDataUmum() {
     DATA_TERKINI = data;
     JENIS_TERKINI = jenis;
 
-    thead.innerHTML = '<tr>' + konfig.kolom.map(k => '<th>' + k + '</th>').join('') + '<th>Aksi</th></tr>';
-    tbody.innerHTML = '';
+    isi.innerHTML = '';
+    totalWrap.innerHTML = '';
 
     if (data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="' + (konfig.kolom.length + 1) + '" style="text-align:center; color:#999;">Belum ada data</td></tr>';
+      isi.innerHTML = '<div style="text-align:center; color:#999; padding:20px 0;">Belum ada data</div>';
     } else {
+
       data.forEach((item, i) => {
         const kolomBaris = konfig.baris(item, i);
-        const tr = document.createElement('tr');
-        tr.innerHTML =
-          kolomBaris.map(v => '<td>' + v + '</td>').join('') +
-          '<td><button class="btnHapus" onclick="hapusData(\'' + konfig.table + '\', ' + item.id + ')">Hapus</button></td>';
-        tbody.appendChild(tr);
+
+        let rows = '';
+        for (let idx = 1; idx < konfig.kolom.length; idx++) {
+          rows += '<div class="dataRow"><span class="labelKolom">' + konfig.kolom[idx] + '</span><span class="valueKolom">' + kolomBaris[idx] + '</span></div>';
+        }
+
+        const card = document.createElement('div');
+        card.className = 'dataCard';
+        card.innerHTML =
+          '<div class="dataCardTop"><span class="noBadge">#' + kolomBaris[0] + '</span>' +
+          '<button class="btnHapus" onclick="hapusData(\'' + konfig.table + '\', ' + item.id + ')">Hapus</button></div>' +
+          rows;
+
+        isi.appendChild(card);
       });
+
+      // ===== BARIS TOTAL =====
+      if (konfig.totalBaris) {
+        const totalRow = konfig.totalBaris(data);
+        let totalRows = '';
+        for (let idx = 1; idx < konfig.kolom.length; idx++) {
+          if (totalRow[idx] === '' || totalRow[idx] === null || totalRow[idx] === undefined) continue;
+          totalRows += '<div class="dataRow"><span class="labelKolom">' + konfig.kolom[idx] + '</span><span class="valueKolom">' + totalRow[idx] + '</span></div>';
+        }
+        totalWrap.innerHTML = '<div class="totalCard"><div class="totalTitle">Ringkasan Total (' + data.length + ' data)</div>' + totalRows + '</div>';
+      }
+
       btnExcel.style.display = 'block';
       btnPdf.style.display = 'block';
     }
@@ -1472,6 +1766,15 @@ function downloadExcel() {
       return obj;
     });
 
+    if (konfig.totalBaris) {
+      const totalRow = konfig.totalBaris(DATA_TERKINI);
+      const totalObj = {};
+      konfig.kolom.forEach((namaKolom, idx) => {
+        totalObj[namaKolom] = totalRow[idx];
+      });
+      rows.push(totalObj);
+    }
+
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, JENIS_TERKINI);
@@ -1500,6 +1803,10 @@ function downloadPdf() {
     const konfig = KONFIG_TABEL[JENIS_TERKINI];
     const rows = DATA_TERKINI.map((item, i) => konfig.baris(item, i));
 
+    if (konfig.totalBaris) {
+      rows.push(konfig.totalBaris(DATA_TERKINI));
+    }
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation: 'landscape' });
 
@@ -1513,7 +1820,13 @@ function downloadPdf() {
       body: rows,
       startY: 26,
       styles: { fontSize: 8 },
-      headStyles: { fillColor: [25, 118, 210] }
+      headStyles: { fillColor: [25, 118, 210] },
+      didParseCell: function(data) {
+        if (konfig.totalBaris && data.row.index === rows.length - 1 && data.section === 'body') {
+          data.cell.styles.fontStyle = 'bold';
+          data.cell.styles.fillColor = [232, 240, 254];
+        }
+      }
     });
 
     const namaFile = JENIS_TERKINI + '_' + tanggalHariIni() + '.pdf';
