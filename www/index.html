@@ -46,6 +46,11 @@
   .orange { border-left: 5px solid #ef6c00; }
   .merah { border-left: 5px solid #d32f2f; }
   .ungu { border-left: 5px solid #7b1fa2; }
+  .teal { border-left: 5px solid #00838f; }
+  .pink { border-left: 5px solid #c2185b; }
+  .kuning { border-left: 5px solid #f9a825; }
+  .coklat { border-left: 5px solid #6d4c41; }
+  .indigo { border-left: 5px solid #3949ab; }
 
   label { display: block; font-size: 14px; font-weight: bold; margin-top: 14px; margin-bottom: 6px; }
 
@@ -82,6 +87,7 @@
   .btnUngu { background: #7b1fa2; color: white; }
   .btnAbu { background: #555; color: white; }
   .btnDashboard { background: #263238; color: white; }
+  .btnTeal { background: #00838f; color: white; }
 
   .menuButton { margin-top: 8px; }
   .tombolSimpan { margin-top: 18px; }
@@ -221,27 +227,27 @@
       <div class="nilai" id="dashProfit">Rp0</div>
     </div>
 
-    <div class="dashboardCard biru">
+    <div class="dashboardCard teal">
       <div class="judul">Sisa Ikan</div>
       <div class="nilai" id="dashStockPcs">0 Ekor</div>
     </div>
 
-    <div class="dashboardCard merah">
+    <div class="dashboardCard pink">
       <div class="judul">Total Susut</div>
       <div class="nilai" id="dashSusut">0 Kg</div>
     </div>
 
-    <div class="dashboardCard hijau">
+    <div class="dashboardCard kuning">
       <div class="judul">Rata-rata Berat</div>
       <div class="nilai" id="dashRataBerat">0 Kg/Ekor</div>
     </div>
 
-    <div class="dashboardCard orange">
+    <div class="dashboardCard coklat">
       <div class="judul">Kebutuhan Pakan/Hari</div>
       <div class="nilai" id="dashKebutuhanPakan">0 Kg</div>
     </div>
 
-    <div class="dashboardCard ungu">
+    <div class="dashboardCard indigo">
       <div class="judul">Sisa Pakan</div>
       <div class="nilai" id="dashSisaPakan">0 Kg</div>
     </div>
@@ -251,6 +257,7 @@
   <div class="card" style="margin-top:16px;">
     <h2>Informasi Stock</h2>
     <p><strong>Terakhir Update:</strong> <span id="dashUpdateStock">-</span></p>
+    <p><strong>Pakan Bertahan:</strong> <span id="dashBertahanPakan">-</span></p>
 
     <div class="buttonGrid">
       <button class="btnBiru" onclick="bukaInput()">+ Input Data</button>
@@ -258,8 +265,18 @@
       <button class="btnOrange" onclick="bukaKeuntungan()">Lihat Keuntungan</button>
       <button class="btnUngu" onclick="bukaInputStock()">Kelola Stock Ikan</button>
       <button class="btnDashboard" onclick="bukaInputPakan()">Stock Pakan</button>
-      <button class="btnDashboard" onclick="bukaPemberianPakan()">Pemberian Pakan</button>
+      <button class="btnTeal" onclick="bukaPemberianPakan()">Pemberian Pakan</button>
     </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h2 style="font-size:16px; margin-bottom:12px;">Pengaturan Kebutuhan Pakan</h2>
+    <label>Persentase Pakan Harian dari Bobot Ikan (%)</label>
+    <div style="display:flex; gap:8px; align-items:flex-end;">
+      <input id="inputPersentasePakan" type="number" step="0.1" min="0" placeholder="Contoh: 5" style="flex:1;">
+      <button class="btnBiru" style="width:auto; padding:0 18px; min-height:46px;" onclick="simpanPersentasePakan()">Simpan</button>
+    </div>
+    <div id="pesanPersentasePakan" style="margin-top:8px; font-size:13px; font-weight:bold;"></div>
   </div>
 
 </div>
@@ -790,7 +807,53 @@ async function getSisaPakan() {
    PERSENTASE PAKAN HARIAN
    Ubah angka ini kalau mau coba nilai lain (umumnya 3-5% dari total bobot ikan per hari)
 ===================================================== */
-const PERSENTASE_PAKAN = 0.05;
+let PERSENTASE_PAKAN = 0.05; // nilai default, akan ditimpa dari database saat halaman dibuka
+
+async function muatPersentasePakan() {
+  try {
+    const data = await sbSelect('pengaturan', '?key=eq.persentase_pakan&select=value');
+    if (data.length > 0) {
+      PERSENTASE_PAKAN = parseFloat(data[0].value) / 100;
+      const input = document.getElementById('inputPersentasePakan');
+      if (input) input.value = data[0].value;
+    }
+  } catch (err) {
+    console.error('Gagal memuat persentase pakan:', err);
+  }
+}
+
+async function simpanPersentasePakan() {
+  const input = document.getElementById('inputPersentasePakan');
+  const pesan = document.getElementById('pesanPersentasePakan');
+  const nilai = angka(input.value);
+
+  if (!nilai || nilai <= 0) {
+    pesan.style.color = 'red';
+    pesan.innerText = 'Masukkan persentase yang valid.';
+    return;
+  }
+
+  try {
+    pesan.style.color = '#333';
+    pesan.innerText = 'Menyimpan...';
+
+    await fetch(SUPABASE_URL + '/rest/v1/pengaturan?key=eq.persentase_pakan', {
+      method: 'PATCH',
+      headers: SB_HEADERS,
+      body: JSON.stringify({ value: String(nilai) })
+    });
+
+    PERSENTASE_PAKAN = nilai / 100;
+    pesan.style.color = 'green';
+    pesan.innerText = 'Persentase pakan berhasil diubah menjadi ' + nilai + '%.';
+
+    muatDashboard();
+
+  } catch (err) {
+    pesan.style.color = 'red';
+    pesan.innerText = 'Gagal: ' + err.message;
+  }
+}
 
 /* =====================================================
    HITUNG SISA PAKAN (Kg) SECARA REAL-TIME
@@ -1595,6 +1658,17 @@ async function muatDashboard() {
     const kebutuhanPakanHarian = sisaStockKg * PERSENTASE_PAKAN;
     const sisaPakan = await getSisaPakan();
 
+    // Hitung sampai tanggal berapa pakan akan bertahan
+    let teksBertahanPakan = '-';
+    if (sisaPakan <= 0) {
+      teksBertahanPakan = 'Stock pakan habis!';
+    } else if (kebutuhanPakanHarian > 0) {
+      const hariBertahan = Math.floor(sisaPakan / kebutuhanPakanHarian);
+      const tanggalHabis = new Date();
+      tanggalHabis.setDate(tanggalHabis.getDate() + hariBertahan);
+      teksBertahanPakan = 'sampai ' + tanggalHabis.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) + ' (' + hariBertahan + ' hari lagi)';
+    }
+
     document.getElementById('dashPenjualan').innerText = formatRupiah(totalPenjualan);
     document.getElementById('dashBerat').innerText = Math.round(beratTerjual) + ' Kg';
     document.getElementById('dashEkor').innerText = formatAngka(jumlahEkorTerjual, 0) + ' Ekor';
@@ -1602,6 +1676,7 @@ async function muatDashboard() {
     document.getElementById('dashStockPcs').innerText = formatAngka(sisaStockPcs, 0) + ' Ekor';
     document.getElementById('dashProfit').innerText = formatRupiah(profitLoss);
     document.getElementById('dashUpdateStock').innerText = terakhirUpdateStock;
+    document.getElementById('dashBertahanPakan').innerText = teksBertahanPakan;
     document.getElementById('dashSusut').innerText = formatAngka(totalSusut, 3) + ' Kg';
     document.getElementById('dashRataBerat').innerText = formatAngka(rataRataBerat, 3) + ' Kg/Ekor';
     document.getElementById('dashKebutuhanPakan').innerText = formatAngka(kebutuhanPakanHarian, 3) + ' Kg';
@@ -2012,9 +2087,14 @@ async function muatKeuntungan() {
     const totalModalKeseluruhan = totalHpp + totalPinjaman + totalPengeluaranTambahan + totalModalBahan;
 
     // ===== PEMBAGIAN HASIL =====
-    const bagianMuchsal = profitLoss * 0.65;
-    const bagianMartunis = profitLoss * 0.25;
-    const danaDarurat = profitLoss * 0.10;
+    // Profit Kotor = profit SEBELUM potongan pinjaman, supaya Dana Darurat
+    // tidak ikut berkurang gara-gara ada yang ambil pinjaman.
+    // Pinjaman hanya dipotong langsung dari bagian Muchsal/Martunis masing-masing.
+    const profitKotor = profitLoss + totalPinjaman;
+
+    const bagianMuchsal = profitKotor * 0.65;
+    const bagianMartunis = profitKotor * 0.25;
+    const danaDarurat = profitKotor * 0.10;
 
     // Pinjaman & Dividen langsung dipotong dari bagian masing-masing
     const sisaMuchsal = bagianMuchsal - pinjamanMuchsal - dividenMuchsal;
@@ -2052,7 +2132,10 @@ async function muatKeuntungan() {
 /* =====================================================
    JALANKAN SAAT WEB DIBUKA
 ===================================================== */
-muatDashboard();
+(async function() {
+  await muatPersentasePakan();
+  muatDashboard();
+})();
 
 </script>
 
