@@ -6,8 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
 <style>
 
@@ -160,7 +158,8 @@
   .keuntunganBox { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .hasilBox { text-align: center; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; }
   .hasilJudul { background: #1976d2; color: white; padding: 12px 5px; font-weight: bold; }
-  .hasilNilai { padding: 15px 5px; font-weight: bold; font-size: 17px; }
+  .hasilNilai { padding: 15px 5px 4px; font-weight: bold; font-size: 17px; }
+  .hasilRincian { padding: 0 8px 12px; font-size: 11px; color: #888; line-height: 1.5; }
 
   .loading { text-align: center; padding: 30px; color: #666; }
 
@@ -284,6 +283,8 @@
         <div class="customSelectItem" data-value="pinjaman" onclick="csPilih('jenisData','pinjaman','Pinjaman')">Pinjaman</div>
         <div class="customSelectItem" data-value="modalBahan" onclick="csPilih('jenisData','modalBahan','Modal / Bahan Baku')">Modal / Bahan Baku</div>
         <div class="customSelectItem" data-value="modalTambahan" onclick="csPilih('jenisData','modalTambahan','Pengeluaran Tambahan')">Pengeluaran Tambahan</div>
+        <div class="customSelectItem" data-value="hpp" onclick="csPilih('jenisData','hpp','Input HPP')">Input HPP</div>
+        <div class="customSelectItem" data-value="dividen" onclick="csPilih('jenisData','dividen','Input Dividen')">Input Dividen</div>
       </div>
     </div>
     <input type="hidden" id="jenisData" value="penjualan">
@@ -419,6 +420,43 @@
       <input id="jumlahTambahan" type="number" min="0" placeholder="Contoh: 20000">
     </div>
 
+    <!-- INPUT HPP -->
+    <div id="formHpp" class="formBagian">
+      <label>Deskripsi</label>
+      <input id="deskripsiHpp" type="text" placeholder="Contoh: HPP Panen Bulan Juli">
+
+      <label>Tanggal</label>
+      <input id="tanggalHpp" type="date">
+
+      <label>Jumlah (Rp)</label>
+      <input id="jumlahHpp" type="number" min="0" placeholder="Contoh: 1500000">
+    </div>
+
+    <!-- INPUT DIVIDEN -->
+    <div id="formDividen" class="formBagian">
+      <label>Pilih Penerima</label>
+      <div class="customSelect">
+        <div class="customSelectBtn" onclick="csToggle('penerimaDividen')">
+          <span id="penerimaDividen_label">Muchsal</span>
+          <svg class="csArrow" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1L7 7L13 1" stroke="#5f6b7a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="customSelectPanel" id="penerimaDividen_panel">
+          <div class="customSelectItem terpilih" data-value="Muchsal" onclick="csPilih('penerimaDividen','Muchsal','Muchsal')">Muchsal</div>
+          <div class="customSelectItem" data-value="Martunis" onclick="csPilih('penerimaDividen','Martunis','Martunis')">Martunis</div>
+        </div>
+      </div>
+      <input type="hidden" id="penerimaDividen" value="Muchsal">
+
+      <label>Tanggal</label>
+      <input id="tanggalDividen" type="date">
+
+      <label>Jumlah (Rp)</label>
+      <input id="jumlahDividen" type="number" min="0" placeholder="Contoh: 500000">
+
+      <label>Keterangan (Opsional)</label>
+      <input id="keteranganDividen" type="text" placeholder="Contoh: Penarikan dividen bulan Juli">
+    </div>
+
     <button id="tombolSimpan" class="btnBiru tombolSimpan" onclick="simpan()">Simpan Data</button>
     <div id="pesan"></div>
 
@@ -531,7 +569,12 @@
 <!-- ===================== LIHAT & KELOLA DATA ===================== -->
 <div id="halamanLihatData" class="halaman">
   <div class="card">
-    <h2>Lihat &amp; Kelola Data</h2>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h2 style="margin:0;">Lihat &amp; Kelola Data</h2>
+      <button id="btnDownloadExcel" onclick="downloadExcel()" title="Download Excel" style="display:none; width:38px; min-height:38px; padding:0; border-radius:9px; background:#1d6f42; flex-shrink:0; align-items:center; justify-content:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;"><rect x="3" y="3" width="18" height="18" rx="3" fill="white" fill-opacity="0.18"/><path d="M7 8h10M7 12h10M7 16h6" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
 
     <label>Pilih Jenis Data</label>
     <div class="customSelect">
@@ -546,6 +589,8 @@
         <div class="customSelectItem" data-value="pinjaman" onclick="csPilih('jenisLihatData','pinjaman','Pinjaman')">Pinjaman</div>
         <div class="customSelectItem" data-value="modalBahan" onclick="csPilih('jenisLihatData','modalBahan','Modal / Bahan Baku')">Modal / Bahan Baku</div>
         <div class="customSelectItem" data-value="modalTambahan" onclick="csPilih('jenisLihatData','modalTambahan','Pengeluaran Tambahan')">Pengeluaran Tambahan</div>
+        <div class="customSelectItem" data-value="hpp" onclick="csPilih('jenisLihatData','hpp','Input HPP')">Input HPP</div>
+        <div class="customSelectItem" data-value="dividen" onclick="csPilih('jenisLihatData','dividen','Dividen')">Dividen</div>
         <div class="customSelectItem" data-value="stock" onclick="csPilih('jenisLihatData','stock','Data Stock')">Data Stock</div>
         <div class="customSelectItem" data-value="stockPakan" onclick="csPilih('jenisLihatData','stockPakan','Stock Pakan')">Stock Pakan</div>
         <div class="customSelectItem" data-value="pemberianPakan" onclick="csPilih('jenisLihatData','pemberianPakan','Pemberian Pakan')">Pemberian Pakan</div>
@@ -558,11 +603,6 @@
     <div id="wrapperTabelLihatData" style="display:none; margin-top:16px;">
       <div id="isiTabelLihatData"></div>
       <div id="totalLihatData"></div>
-    </div>
-
-    <div class="buttonGrid">
-      <button class="btnHijau" id="btnDownloadExcel" onclick="downloadExcel()" style="display:none;">⬇ Excel</button>
-      <button class="btnOrange" id="btnDownloadPdf" onclick="downloadPdf()" style="display:none;">⬇ PDF</button>
     </div>
 
     <button class="btnAbu menuButton" onclick="kembaliHome()">← Kembali ke Home</button>
@@ -585,7 +625,7 @@
           <div class="nilai" id="profitPengeluaran">Rp0</div>
         </div>
         <div class="dashboardCard hijau">
-          <div class="judul">Total Pemasukan</div>
+          <div class="judul">Saldo Kas Saat Ini</div>
           <div class="nilai" id="profitPemasukan">Rp0</div>
         </div>
         <div class="dashboardCard biru">
@@ -601,18 +641,24 @@
       <h2 style="margin-top:30px;">Pembagian Hasil</h2>
 
       <div class="keuntunganBox">
+
         <div class="hasilBox">
-          <div class="hasilJudul">MUCHSAL</div>
+          <div class="hasilJudul">MUCHSAL (65%)</div>
           <div class="hasilNilai" id="hasilMuchsal">Rp0</div>
+          <div class="hasilRincian" id="rincianMuchsal"></div>
         </div>
+
         <div class="hasilBox">
-          <div class="hasilJudul">MARTUNIS</div>
+          <div class="hasilJudul">MARTUNIS (25%)</div>
           <div class="hasilNilai" id="hasilMartunis">Rp0</div>
+          <div class="hasilRincian" id="rincianMartunis"></div>
         </div>
+
         <div class="hasilBox">
-          <div class="hasilJudul">DANA DARURAT</div>
+          <div class="hasilJudul">DANA DARURAT (10%)</div>
           <div class="hasilNilai" id="hasilDanaDarurat">Rp0</div>
         </div>
+
       </div>
 
     </div>
@@ -768,6 +814,8 @@ document.getElementById('tanggalTester').value = tanggalHariIni();
 document.getElementById('tanggalKematian').value = tanggalHariIni();
 document.getElementById('tanggalPinjaman').value = tanggalHariIni();
 document.getElementById('tanggalTambahan').value = tanggalHariIni();
+document.getElementById('tanggalHpp').value = tanggalHariIni();
+document.getElementById('tanggalDividen').value = tanggalHariIni();
 document.getElementById('tanggalStock').value = tanggalHariIni();
 document.getElementById('tanggalPakan').value = tanggalHariIni();
 document.getElementById('tanggalPemberianPakan').value = tanggalHariIni();
@@ -881,7 +929,9 @@ function ubahJenisData() {
     kematian: 'formKematian',
     pinjaman: 'formPinjaman',
     modalBahan: 'formModalBahan',
-    modalTambahan: 'formModalTambahan'
+    modalTambahan: 'formModalTambahan',
+    hpp: 'formHpp',
+    dividen: 'formDividen'
   };
 
   document.getElementById(mapping[jenis]).classList.add('aktif');
@@ -1132,6 +1182,68 @@ async function simpan() {
       pesan.style.color = 'green';
       pesan.innerText = 'Pengeluaran tambahan berhasil disimpan.';
       bersihkanForm('modalTambahan');
+
+    }
+
+    else if (jenis === 'hpp') {
+
+      const deskripsi = document.getElementById('deskripsiHpp').value;
+      const tanggal = document.getElementById('tanggalHpp').value;
+      const jumlah = document.getElementById('jumlahHpp').value;
+
+      if (!deskripsi || !tanggal || !jumlah) {
+        tampilkanError('Mohon lengkapi data HPP.');
+        return;
+      }
+
+      const data = {
+        deskripsi: deskripsi,
+        tanggal: tanggal,
+        jumlah: angka(jumlah)
+      };
+
+      tombol.disabled = true;
+      tombol.innerText = 'Menyimpan...';
+      pesan.style.color = '#333';
+      pesan.innerText = 'Sedang menyimpan data...';
+
+      await sbInsert('hpp', data);
+
+      pesan.style.color = 'green';
+      pesan.innerText = 'Data HPP berhasil disimpan.';
+      bersihkanForm('hpp');
+
+    }
+
+    else if (jenis === 'dividen') {
+
+      const penerima = document.getElementById('penerimaDividen').value;
+      const tanggal = document.getElementById('tanggalDividen').value;
+      const jumlah = document.getElementById('jumlahDividen').value;
+      const keterangan = document.getElementById('keteranganDividen').value;
+
+      if (!tanggal || !jumlah) {
+        tampilkanError('Mohon lengkapi data Dividen.');
+        return;
+      }
+
+      const data = {
+        penerima: penerima,
+        tanggal: tanggal,
+        jumlah: angka(jumlah),
+        keterangan: keterangan || null
+      };
+
+      tombol.disabled = true;
+      tombol.innerText = 'Menyimpan...';
+      pesan.style.color = '#333';
+      pesan.innerText = 'Sedang menyimpan data...';
+
+      await sbInsert('dividen', data);
+
+      pesan.style.color = 'green';
+      pesan.innerText = 'Dividen ' + penerima + ' berhasil dicatat.';
+      bersihkanForm('dividen');
 
     }
 
@@ -1423,6 +1535,14 @@ function bersihkanForm(jenis) {
     document.getElementById('deskripsiTambahan').value = '';
     document.getElementById('jumlahTambahan').value = '';
   }
+  if (jenis === 'hpp') {
+    document.getElementById('deskripsiHpp').value = '';
+    document.getElementById('jumlahHpp').value = '';
+  }
+  if (jenis === 'dividen') {
+    document.getElementById('jumlahDividen').value = '';
+    document.getElementById('keteranganDividen').value = '';
+  }
 }
 
 
@@ -1600,6 +1720,36 @@ const KONFIG_TABEL = {
     }
   },
 
+  hpp: {
+    table: 'hpp',
+    query: '?select=*&order=id.asc',
+    kolom: ['No', 'Deskripsi', 'Tanggal', 'Jumlah'],
+    baris: (item, i) => {
+      const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
+      return [i + 1, item.deskripsi, tanggal, formatRupiah(item.jumlah)];
+    },
+    totalBaris: (data) => {
+      let total = 0;
+      data.forEach(item => total += angka(item.jumlah));
+      return ['TOTAL', '', '', formatRupiah(total)];
+    }
+  },
+
+  dividen: {
+    table: 'dividen',
+    query: '?select=*&order=id.asc',
+    kolom: ['No', 'Penerima', 'Tanggal', 'Jumlah', 'Keterangan'],
+    baris: (item, i) => {
+      const tanggal = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
+      return [i + 1, item.penerima, tanggal, formatRupiah(item.jumlah), item.keterangan || '-'];
+    },
+    totalBaris: (data) => {
+      let total = 0;
+      data.forEach(item => total += angka(item.jumlah));
+      return ['TOTAL', '', '', formatRupiah(total), ''];
+    }
+  },
+
   stock: {
     table: 'stock',
     query: '?select=*&order=id.asc',
@@ -1662,12 +1812,10 @@ async function muatDataUmum() {
   const isi = document.getElementById('isiTabelLihatData');
   const totalWrap = document.getElementById('totalLihatData');
   const btnExcel = document.getElementById('btnDownloadExcel');
-  const btnPdf = document.getElementById('btnDownloadPdf');
 
   loading.style.display = 'block';
   wrapper.style.display = 'none';
   btnExcel.style.display = 'none';
-  btnPdf.style.display = 'none';
 
   try {
 
@@ -1713,8 +1861,7 @@ async function muatDataUmum() {
         totalWrap.innerHTML = '<div class="totalCard"><div class="totalTitle">Ringkasan Total (' + data.length + ' data)</div>' + totalRows + '</div>';
       }
 
-      btnExcel.style.display = 'block';
-      btnPdf.style.display = 'block';
+      btnExcel.style.display = 'flex';
     }
 
     loading.style.display = 'none';
@@ -1748,7 +1895,7 @@ async function hapusData(table, id) {
 function downloadExcel() {
 
   if (typeof XLSX === 'undefined') {
-    alert('Library Excel belum termuat. Pastikan koneksi internet aktif, lalu buka ulang aplikasi ini di browser (Chrome), bukan di preview Acode.');
+    alert('Library Excel belum termuat. Pastikan koneksi internet aktif, lalu buka ulang aplikasi ini di browser Chrome (bukan preview Acode).');
     return;
   }
 
@@ -1777,62 +1924,23 @@ function downloadExcel() {
 
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, JENIS_TERKINI);
+    XLSX.utils.book_append_sheet(wb, ws, JENIS_TERKINI.substring(0, 31));
 
     const namaFile = JENIS_TERKINI + '_' + tanggalHariIni() + '.xlsx';
-    XLSX.writeFile(wb, namaFile);
+
+    // Pakai data: URI (bukan blob:) supaya lebih kompatibel di WebView Android/Acode
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'base64' });
+    const dataUri = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + wbout;
+
+    const link = document.createElement('a');
+    link.href = dataUri;
+    link.download = namaFile;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
   } catch (err) {
     alert('Gagal membuat file Excel: ' + err.message);
-  }
-}
-
-
-/* =====================================================
-   DOWNLOAD PDF
-===================================================== */
-function downloadPdf() {
-
-  if (typeof window.jspdf === 'undefined') {
-    alert('Library PDF belum termuat. Pastikan koneksi internet aktif, lalu buka ulang aplikasi ini di browser (Chrome), bukan di preview Acode.');
-    return;
-  }
-
-  if (!DATA_TERKINI.length) return;
-
-  try {
-    const konfig = KONFIG_TABEL[JENIS_TERKINI];
-    const rows = DATA_TERKINI.map((item, i) => konfig.baris(item, i));
-
-    if (konfig.totalBaris) {
-      rows.push(konfig.totalBaris(DATA_TERKINI));
-    }
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'landscape' });
-
-    doc.setFontSize(14);
-    doc.text('Catfish Management - ' + JENIS_TERKINI, 14, 15);
-    doc.setFontSize(9);
-    doc.text('Diunduh: ' + tanggalHariIni(), 14, 21);
-
-    doc.autoTable({
-      head: [konfig.kolom],
-      body: rows,
-      startY: 26,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [25, 118, 210] },
-      didParseCell: function(data) {
-        if (konfig.totalBaris && data.row.index === rows.length - 1 && data.section === 'body') {
-          data.cell.styles.fontStyle = 'bold';
-          data.cell.styles.fillColor = [232, 240, 254];
-        }
-      }
-    });
-
-    const namaFile = JENIS_TERKINI + '_' + tanggalHariIni() + '.pdf';
-    doc.save(namaFile);
-  } catch (err) {
-    alert('Gagal membuat file PDF: ' + err.message);
   }
 }
 
@@ -1850,31 +1958,86 @@ async function muatKeuntungan() {
 
   try {
 
+    // ===== TOTAL PENJUALAN (uang hasil penjualan) =====
     const penjualan = await sbSelect('penjualan', '?select=subtotal,tujuan');
-    let totalPemasukan = 0;
+    let totalPenjualan = 0;
     penjualan.forEach(row => {
-      if (row.tujuan === 'Penjualan' || !row.tujuan) totalPemasukan += angka(row.subtotal);
+      if (row.tujuan === 'Penjualan' || !row.tujuan) totalPenjualan += angka(row.subtotal);
     });
 
-    const modal = await sbSelect('modal', '?select=subtotal');
-    let totalPengeluaran = 0;
+    // ===== PINJAMAN (per orang) =====
+    const pinjaman = await sbSelect('pinjaman', '?select=peminjam,jumlah');
+    let totalPinjaman = 0, pinjamanMuchsal = 0, pinjamanMartunis = 0;
+    pinjaman.forEach(row => {
+      const j = angka(row.jumlah);
+      totalPinjaman += j;
+      if (row.peminjam === 'Muchsal') pinjamanMuchsal += j;
+      if (row.peminjam === 'Martunis') pinjamanMartunis += j;
+    });
+
+    // ===== MODAL (bahan baku & pengeluaran tambahan, dipisah) =====
+    const modal = await sbSelect('modal', '?select=jenis,subtotal');
+    let totalModalBahan = 0, totalPengeluaranTambahan = 0;
     modal.forEach(row => {
-      totalPengeluaran += angka(row.subtotal);
+      if (row.jenis === 'bahan') totalModalBahan += angka(row.subtotal);
+      if (row.jenis === 'tambahan') totalPengeluaranTambahan += angka(row.subtotal);
     });
 
-    const profitLoss = totalPemasukan - totalPengeluaran;
+    // ===== HPP =====
+    const hppData = await sbSelect('hpp', '?select=jumlah');
+    let totalHpp = 0;
+    hppData.forEach(row => totalHpp += angka(row.jumlah));
 
-    // Pembagian hasil sederhana: 40% Muchsal, 40% Martunis, 20% Dana Darurat (ubah sesuai kesepakatan)
-    const muchsal = profitLoss > 0 ? profitLoss * 0.4 : 0;
-    const martunis = profitLoss > 0 ? profitLoss * 0.4 : 0;
-    const danaDarurat = profitLoss > 0 ? profitLoss * 0.2 : 0;
+    // ===== DIVIDEN (per orang) =====
+    const dividenData = await sbSelect('dividen', '?select=penerima,jumlah');
+    let dividenMuchsal = 0, dividenMartunis = 0;
+    dividenData.forEach(row => {
+      const j = angka(row.jumlah);
+      if (row.penerima === 'Muchsal') dividenMuchsal += j;
+      if (row.penerima === 'Martunis') dividenMartunis += j;
+    });
 
+    // ===== RUMUS UTAMA =====
+
+    // Total Pengeluaran (kartu) = modal bahan baku saja
+    const totalPengeluaran = totalModalBahan;
+
+    // Saldo Kas Saat Ini = penjualan - pinjaman - pengeluaran tambahan
+    const saldoKas = totalPenjualan - totalPinjaman - totalPengeluaranTambahan;
+
+    // Profit / Loss = Saldo Kas - Total Pengeluaran (modal bahan baku)
+    const profitLoss = saldoKas - totalPengeluaran;
+
+    // Total Modal Keseluruhan = HPP + Pinjaman + Pengeluaran Tambahan + Modal Bahan Baku
+    const totalModalKeseluruhan = totalHpp + totalPinjaman + totalPengeluaranTambahan + totalModalBahan;
+
+    // ===== PEMBAGIAN HASIL =====
+    const bagianMuchsal = profitLoss * 0.65;
+    const bagianMartunis = profitLoss * 0.25;
+    const danaDarurat = profitLoss * 0.10;
+
+    // Pinjaman & Dividen langsung dipotong dari bagian masing-masing
+    const sisaMuchsal = bagianMuchsal - pinjamanMuchsal - dividenMuchsal;
+    const sisaMartunis = bagianMartunis - pinjamanMartunis - dividenMartunis;
+
+    // ===== TAMPILKAN =====
     document.getElementById('profitPengeluaran').innerText = formatRupiah(totalPengeluaran);
-    document.getElementById('profitPemasukan').innerText = formatRupiah(totalPemasukan);
+    document.getElementById('profitPemasukan').innerText = formatRupiah(saldoKas);
     document.getElementById('profitUtama').innerText = formatRupiah(profitLoss);
-    document.getElementById('profitTotalModal').innerText = formatRupiah(totalPengeluaran);
-    document.getElementById('hasilMuchsal').innerText = formatRupiah(muchsal);
-    document.getElementById('hasilMartunis').innerText = formatRupiah(martunis);
+    document.getElementById('profitTotalModal').innerText = formatRupiah(totalModalKeseluruhan);
+
+    document.getElementById('hasilMuchsal').innerText = formatRupiah(sisaMuchsal);
+    document.getElementById('rincianMuchsal').innerHTML =
+      'Bagian: ' + formatRupiah(bagianMuchsal) + '<br>' +
+      '– Pinjaman: ' + formatRupiah(pinjamanMuchsal) + '<br>' +
+      '– Dividen diambil: ' + formatRupiah(dividenMuchsal);
+
+    document.getElementById('hasilMartunis').innerText = formatRupiah(sisaMartunis);
+    document.getElementById('rincianMartunis').innerHTML =
+      'Bagian: ' + formatRupiah(bagianMartunis) + '<br>' +
+      '– Pinjaman: ' + formatRupiah(pinjamanMartunis) + '<br>' +
+      '– Dividen diambil: ' + formatRupiah(dividenMartunis);
+
     document.getElementById('hasilDanaDarurat').innerText = formatRupiah(danaDarurat);
 
     loading.style.display = 'none';
