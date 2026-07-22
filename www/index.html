@@ -30,6 +30,18 @@
   .halaman { display: none; }
   .halaman.aktif { display: block; }
 
+  #halamanLogin.aktif {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 170px);
+  }
+  #halamanLogin .card {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
   .card {
     background: white; border-radius: 18px; padding: 22px; margin-bottom: 16px;
     box-shadow: 0 4px 18px rgba(0,0,0,0.08);
@@ -89,6 +101,7 @@
   .btnDashboard { background: #263238; color: white; }
   .btnTeal { background: #00838f; color: white; }
   .btnSlate { background: #455a64; color: white; }
+  .btnCoklat { background: #8d6e63; color: white; }
 
   #infoAkunHeader {
     display: none; margin-top: 10px; font-size: 13px; align-items: center;
@@ -96,6 +109,7 @@
     padding: 8px 12px; border-radius: 8px;
   }
   #infoAkunHeader.tampil { display: flex; }
+  .hanyaUser { display: none; }
 
   .menuButton { margin-top: 8px; }
   .tombolSimpan { margin-top: 18px; }
@@ -182,6 +196,18 @@
     padding: 6px 14px; font-size: 12px; font-weight: bold; cursor: pointer;
     width: auto; min-height: auto;
   }
+  .btnEdit {
+    background: #1976d2; color: white; border: none; border-radius: 8px;
+    padding: 6px 14px; font-size: 12px; font-weight: bold; cursor: pointer;
+    width: auto; min-height: auto;
+  }
+  .editForm label {
+    font-size: 12px; font-weight: bold; display: block; margin-top: 8px; margin-bottom: 3px;
+  }
+  .editForm input, .editForm select {
+    width: 100%; height: 40px; font-size: 14px; border: 1px solid #ccc;
+    border-radius: 8px; padding: 0 10px; background: white;
+  }
 
   @media (max-width: 600px) {
     .header h1 { font-size: 24px; }
@@ -250,9 +276,14 @@
       <div class="nilai" id="dashStock">0 Kg</div>
     </div>
 
-    <div class="dashboardCard merah">
+    <div class="dashboardCard merah hanyaAdmin">
       <div class="judul">Profit / Loss</div>
       <div class="nilai" id="dashProfit">Rp0</div>
+    </div>
+
+    <div class="dashboardCard merah hanyaUser">
+      <div class="judul">Pakan Sekali Beri (3x/hari)</div>
+      <div class="nilai" id="dashPakanSekaliBeri">0 Kg</div>
     </div>
 
     <div class="dashboardCard teal">
@@ -294,7 +325,8 @@
       <button class="btnUngu" onclick="bukaInputStock()">Kelola Stock Ikan</button>
       <button class="btnDashboard" onclick="bukaInputPakan()">Stock Pakan</button>
       <button class="btnTeal" onclick="bukaPemberianPakan()">Pemberian Pakan</button>
-      <button class="btnSlate hanyaAdmin" onclick="bukaKelolaAkun()" style="grid-column: 1 / -1;">Kelola Akun</button>
+      <button class="btnSlate hanyaAdmin" onclick="bukaKelolaAkun()">Kelola Akun</button>
+      <button class="btnCoklat hanyaAdmin" onclick="bukaAmbilDanaDarurat()">Ambil Dana Darurat</button>
     </div>
   </div>
 
@@ -329,8 +361,8 @@
         <div class="customSelectItem" data-value="pinjaman" onclick="csPilih('jenisData','pinjaman','Pinjaman')">Pinjaman</div>
         <div class="customSelectItem" data-value="modalBahan" onclick="csPilih('jenisData','modalBahan','Modal / Bahan Baku')">Modal / Bahan Baku</div>
         <div class="customSelectItem" data-value="modalTambahan" onclick="csPilih('jenisData','modalTambahan','Pengeluaran Tambahan')">Pengeluaran Tambahan</div>
-        <div class="customSelectItem" data-value="hpp" onclick="csPilih('jenisData','hpp','Input HPP')">Input HPP</div>
-        <div class="customSelectItem" data-value="dividen" onclick="csPilih('jenisData','dividen','Input Dividen')">Input Dividen</div>
+        <div class="customSelectItem hanyaAdmin" data-value="hpp" onclick="csPilih('jenisData','hpp','Input HPP')">Input HPP</div>
+        <div class="customSelectItem hanyaAdmin" data-value="dividen" onclick="csPilih('jenisData','dividen','Input Dividen')">Input Dividen</div>
       </div>
     </div>
     <input type="hidden" id="jenisData" value="penjualan">
@@ -517,18 +549,20 @@
   <div class="card">
     <h2>Kelola Stock Ikan</h2>
 
-    <label>Jenis Transaksi</label>
-    <div class="customSelect">
-      <div class="customSelectBtn" onclick="csToggle('jenisTransaksiStock')">
-        <span id="jenisTransaksiStock_label">Tambah Stock</span>
-        <svg class="csArrow" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1L7 7L13 1" stroke="#5f6b7a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="hanyaAdmin">
+      <label>Jenis Transaksi</label>
+      <div class="customSelect">
+        <div class="customSelectBtn" onclick="csToggle('jenisTransaksiStock')">
+          <span id="jenisTransaksiStock_label">Tambah Stock</span>
+          <svg class="csArrow" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1L7 7L13 1" stroke="#5f6b7a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="customSelectPanel" id="jenisTransaksiStock_panel">
+          <div class="customSelectItem terpilih" data-value="tambah" onclick="csPilih('jenisTransaksiStock','tambah','Tambah Stock')">Tambah Stock</div>
+          <div class="customSelectItem" data-value="kurang" onclick="csPilih('jenisTransaksiStock','kurang','Kurangi Stock')">Kurangi Stock</div>
+        </div>
       </div>
-      <div class="customSelectPanel" id="jenisTransaksiStock_panel">
-        <div class="customSelectItem terpilih" data-value="tambah" onclick="csPilih('jenisTransaksiStock','tambah','Tambah Stock')">Tambah Stock</div>
-        <div class="customSelectItem" data-value="kurang" onclick="csPilih('jenisTransaksiStock','kurang','Kurangi Stock')">Kurangi Stock</div>
-      </div>
+      <input type="hidden" id="jenisTransaksiStock" value="tambah">
     </div>
-    <input type="hidden" id="jenisTransaksiStock" value="tambah">
 
     <div class="keterangan" id="keteranganModeStock" style="margin:10px 0;">Jumlah di sini akan <strong>ditambahkan</strong> ke stock yang ada.</div>
 
@@ -557,18 +591,20 @@
   <div class="card">
     <h2>Kelola Stock Pakan</h2>
 
-    <label>Jenis Transaksi</label>
-    <div class="customSelect">
-      <div class="customSelectBtn" onclick="csToggle('jenisTransaksiPakan')">
-        <span id="jenisTransaksiPakan_label">Tambah Stock Pakan</span>
-        <svg class="csArrow" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1L7 7L13 1" stroke="#5f6b7a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="hanyaAdmin">
+      <label>Jenis Transaksi</label>
+      <div class="customSelect">
+        <div class="customSelectBtn" onclick="csToggle('jenisTransaksiPakan')">
+          <span id="jenisTransaksiPakan_label">Tambah Stock Pakan</span>
+          <svg class="csArrow" width="14" height="9" viewBox="0 0 14 9"><path d="M1 1L7 7L13 1" stroke="#5f6b7a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="customSelectPanel" id="jenisTransaksiPakan_panel">
+          <div class="customSelectItem terpilih" data-value="tambah" onclick="csPilih('jenisTransaksiPakan','tambah','Tambah Stock Pakan')">Tambah Stock Pakan</div>
+          <div class="customSelectItem" data-value="kurang" onclick="csPilih('jenisTransaksiPakan','kurang','Kurangi Stock Pakan')">Kurangi Stock Pakan</div>
+        </div>
       </div>
-      <div class="customSelectPanel" id="jenisTransaksiPakan_panel">
-        <div class="customSelectItem terpilih" data-value="tambah" onclick="csPilih('jenisTransaksiPakan','tambah','Tambah Stock Pakan')">Tambah Stock Pakan</div>
-        <div class="customSelectItem" data-value="kurang" onclick="csPilih('jenisTransaksiPakan','kurang','Kurangi Stock Pakan')">Kurangi Stock Pakan</div>
-      </div>
+      <input type="hidden" id="jenisTransaksiPakan" value="tambah">
     </div>
-    <input type="hidden" id="jenisTransaksiPakan" value="tambah">
 
     <div class="keterangan" id="keteranganModePakan" style="margin:10px 0;">Jumlah di sini akan <strong>ditambahkan</strong> ke stock pakan yang ada.</div>
 
@@ -637,6 +673,30 @@
     <button class="btnAbu menuButton" onclick="kembaliHome()">← Kembali ke Home</button>
   </div>
 </div>
+
+
+<!-- ===================== AMBIL DANA DARURAT (Admin) ===================== -->
+<div id="halamanDanaDarurat" class="halaman">
+  <div class="card">
+    <h2>Ambil Dana Darurat</h2>
+    <div class="keterangan" style="margin-bottom:10px;">Sisa Dana Darurat saat ini: <strong id="infoSisaDanaDarurat">Memuat...</strong></div>
+
+    <label>Tanggal</label>
+    <input id="tanggalDanaDarurat" type="date">
+
+    <label>Jumlah yang Diambil (Rp)</label>
+    <input id="jumlahDanaDarurat" type="number" min="0" placeholder="Contoh: 200000">
+
+    <label>Keterangan</label>
+    <input id="keteranganDanaDarurat" type="text" placeholder="Contoh: Perbaikan kolam bocor">
+
+    <button id="tombolDanaDarurat" class="btnCoklat tombolSimpan" onclick="simpanPenarikanDanaDarurat()">Simpan Penarikan</button>
+    <div id="pesanDanaDarurat" style="margin-top:12px; font-weight:bold;"></div>
+
+    <button class="btnAbu menuButton" onclick="kembaliHome()">← Kembali ke Home</button>
+  </div>
+</div>
+
 
 
 <!-- ===================== LIHAT & KELOLA DATA ===================== -->
@@ -885,25 +945,24 @@ async function prosesLogin() {
   const pesan = document.getElementById('pesanLogin');
   const tombol = document.getElementById('tombolLogin');
 
-  if (!username || !password) {
-    pesan.style.color = 'red';
-    pesan.innerText = 'Mohon isi username dan password.';
-    return;
-  }
-
-  tombol.disabled = true;
-  tombol.innerText = 'Memeriksa...';
-  pesan.style.color = '#333';
-  pesan.innerText = 'Sedang memeriksa akun...';
-
   try {
+
+    if (!username || !password) {
+      pesan.style.color = 'red';
+      pesan.innerText = 'Mohon isi username dan password.';
+      return;
+    }
+
+    tombol.disabled = true;
+    tombol.innerText = 'Memeriksa...';
+    pesan.style.color = '#333';
+    pesan.innerText = 'Sedang memeriksa akun...';
+
     const hasil = await sbSelect('akun', '?username=eq.' + encodeURIComponent(username) + '&select=*');
 
     if (hasil.length === 0 || hasil[0].password !== password) {
       pesan.style.color = 'red';
       pesan.innerText = 'Username atau password salah.';
-      tombol.disabled = false;
-      tombol.innerText = 'Login';
       return;
     }
 
@@ -928,6 +987,7 @@ async function prosesLogin() {
   } catch (err) {
     pesan.style.color = 'red';
     pesan.innerText = 'Gagal: ' + err.message;
+    console.error('Login error:', err);
   } finally {
     tombol.disabled = false;
     tombol.innerText = 'Login';
@@ -949,6 +1009,11 @@ document.addEventListener('DOMContentLoaded', function() {
   if (tombolLogout) {
     tombolLogout.addEventListener('click', logout);
   }
+
+  const tombolLoginEl = document.getElementById('tombolLogin');
+  if (tombolLoginEl) {
+    tombolLoginEl.addEventListener('click', prosesLogin);
+  }
 });
 
 function terapkanHakAkses() {
@@ -958,6 +1023,10 @@ function terapkanHakAkses() {
 
   document.querySelectorAll('.hanyaAdmin').forEach(el => {
     el.style.display = isAdmin ? '' : 'none';
+  });
+
+  document.querySelectorAll('.hanyaUser').forEach(el => {
+    el.style.display = isAdmin ? 'none' : '';
   });
 
   const infoHeader = document.getElementById('infoAkunHeader');
@@ -1048,6 +1117,119 @@ async function simpanPasswordBaru() {
 }
 
 
+/* =====================================================
+   AMBIL DANA DARURAT (Admin)
+===================================================== */
+async function getSisaDanaDarurat() {
+
+  const penjualan = await sbSelect('penjualan', '?select=subtotal,tujuan');
+  let totalPenjualan = 0;
+  penjualan.forEach(row => {
+    if (row.tujuan === 'Penjualan' || !row.tujuan) totalPenjualan += angka(row.subtotal);
+  });
+
+  const pinjaman = await sbSelect('pinjaman', '?select=jumlah');
+  let totalPinjaman = 0;
+  pinjaman.forEach(row => totalPinjaman += angka(row.jumlah));
+
+  const modal = await sbSelect('modal', '?select=jenis,subtotal');
+  let totalModalBahan = 0, totalPengeluaranTambahan = 0;
+  modal.forEach(row => {
+    if (row.jenis === 'bahan') totalModalBahan += angka(row.subtotal);
+    if (row.jenis === 'tambahan') totalPengeluaranTambahan += angka(row.subtotal);
+  });
+
+  const saldoKas = totalPenjualan - totalPinjaman - totalPengeluaranTambahan;
+  const profitLoss = saldoKas - totalModalBahan;
+  const profitKotor = profitLoss + totalPinjaman;
+  const danaDarurat = profitKotor * 0.10;
+
+  const penarikan = await sbSelect('dana_darurat_penarikan', '?select=jumlah');
+  let totalPenarikan = 0;
+  penarikan.forEach(row => totalPenarikan += angka(row.jumlah));
+
+  return {
+    danaDarurat: danaDarurat,
+    totalPenarikan: totalPenarikan,
+    sisa: danaDarurat - totalPenarikan
+  };
+}
+
+async function bukaAmbilDanaDarurat() {
+  tampilkanHalaman('halamanDanaDarurat');
+
+  const info = document.getElementById('infoSisaDanaDarurat');
+  info.innerText = 'Memuat...';
+
+  try {
+    const hasil = await getSisaDanaDarurat();
+    info.innerText = formatRupiah(hasil.sisa);
+  } catch (err) {
+    info.innerText = 'Gagal memuat';
+  }
+}
+
+async function simpanPenarikanDanaDarurat() {
+
+  const tombol = document.getElementById('tombolDanaDarurat');
+  const pesan = document.getElementById('pesanDanaDarurat');
+
+  const tanggal = document.getElementById('tanggalDanaDarurat').value;
+  const jumlahInput = document.getElementById('jumlahDanaDarurat').value;
+  const keterangan = document.getElementById('keteranganDanaDarurat').value;
+
+  if (!tanggal || !jumlahInput) {
+    pesan.style.color = 'red';
+    pesan.innerText = 'Mohon lengkapi tanggal dan jumlah.';
+    return;
+  }
+
+  const jumlahN = angka(jumlahInput);
+
+  tombol.disabled = true;
+  tombol.innerText = 'Menyimpan...';
+  pesan.style.color = '#333';
+  pesan.innerText = 'Mengecek sisa dana darurat...';
+
+  try {
+
+    const hasil = await getSisaDanaDarurat();
+
+    if (jumlahN > hasil.sisa) {
+      pesan.style.color = 'red';
+      pesan.innerText = 'Jumlah melebihi sisa Dana Darurat saat ini (' + formatRupiah(hasil.sisa) + ').';
+      tombol.disabled = false;
+      tombol.innerText = 'Simpan Penarikan';
+      return;
+    }
+
+    pesan.innerText = 'Sedang menyimpan...';
+
+    await sbInsert('dana_darurat_penarikan', {
+      tanggal: tanggal,
+      jumlah: jumlahN,
+      keterangan: keterangan || null
+    });
+
+    pesan.style.color = 'green';
+    pesan.innerText = 'Penarikan Dana Darurat berhasil dicatat.';
+
+    document.getElementById('jumlahDanaDarurat').value = '';
+    document.getElementById('keteranganDanaDarurat').value = '';
+
+    const hasilBaru = await getSisaDanaDarurat();
+    document.getElementById('infoSisaDanaDarurat').innerText = formatRupiah(hasilBaru.sisa);
+
+  } catch (err) {
+    pesan.style.color = 'red';
+    pesan.innerText = 'Gagal: ' + err.message;
+  } finally {
+    tombol.disabled = false;
+    tombol.innerText = 'Simpan Penarikan';
+  }
+}
+
+
 let PERSENTASE_PAKAN = 0.05; // nilai default, akan ditimpa dari database saat halaman dibuka
 
 async function muatPersentasePakan() {
@@ -1120,6 +1302,7 @@ document.getElementById('tanggalPinjaman').value = tanggalHariIni();
 document.getElementById('tanggalTambahan').value = tanggalHariIni();
 document.getElementById('tanggalHpp').value = tanggalHariIni();
 document.getElementById('tanggalDividen').value = tanggalHariIni();
+document.getElementById('tanggalDanaDarurat').value = tanggalHariIni();
 document.getElementById('tanggalStock').value = tanggalHariIni();
 document.getElementById('tanggalPakan').value = tanggalHariIni();
 document.getElementById('tanggalPemberianPakan').value = tanggalHariIni();
@@ -1897,6 +2080,7 @@ async function muatDashboard() {
     // Hitung pakan: rata-rata berat per ekor, kebutuhan pakan harian, sisa stock pakan
     const rataRataBerat = sisaStockPcs > 0 ? (sisaStockKg / sisaStockPcs) : 0;
     const kebutuhanPakanHarian = sisaStockKg * PERSENTASE_PAKAN;
+    const pakanSekaliBeri = kebutuhanPakanHarian / 3; // 3 kali pemberian per hari
     const sisaPakan = await getSisaPakan();
 
     // Hitung sampai tanggal berapa pakan akan bertahan
@@ -1916,6 +2100,7 @@ async function muatDashboard() {
     document.getElementById('dashStock').innerText = formatAngka(sisaStockKg, 3) + ' Kg';
     document.getElementById('dashStockPcs').innerText = formatAngka(sisaStockPcs, 0) + ' Ekor';
     document.getElementById('dashProfit').innerText = formatRupiah(profitLoss);
+    document.getElementById('dashPakanSekaliBeri').innerText = formatAngka(pakanSekaliBeri, 3) + ' Kg';
     document.getElementById('dashUpdateStock').innerText = terakhirUpdateStock;
     document.getElementById('dashBertahanPakan').innerText = teksBertahanPakan;
     document.getElementById('dashSusut').innerText = formatAngka(totalSusut, 3) + ' Kg';
@@ -1959,7 +2144,21 @@ const KONFIG_TABEL = {
         totalSubtotal += angka(item.subtotal);
       });
       return ['TOTAL', '', '', '', '', formatAngka(totalBerat, 3) + ' Kg', '', formatAngka(totalSusut, 3) + ' Kg', formatAngka(totalEkor, 0), formatRupiah(totalSubtotal)];
-    }
+    },
+    editFields: [
+      { key: 'tanggal', label: 'Tanggal', type: 'date' },
+      { key: 'nama_item', label: 'Nama Item', type: 'text' },
+      { key: 'nama_customer', label: 'Nama Customer', type: 'text' },
+      { key: 'nomor_hp', label: 'Nomor HP', type: 'text' },
+      { key: 'harga', label: 'Harga / Satuan', type: 'number' },
+      { key: 'berat_bayar', label: 'Berat Bayar', type: 'number' },
+      { key: 'berat_timbangan', label: 'Berat Timbangan', type: 'number' },
+      { key: 'jumlah_ekor', label: 'Jumlah Ekor', type: 'number' }
+    ],
+    hitungUlang: (d) => ({
+      subtotal: angka(d.harga) * angka(d.berat_bayar),
+      selisih_berat: angka(d.berat_timbangan) - angka(d.berat_bayar)
+    })
   },
 
   tester: {
@@ -1974,7 +2173,11 @@ const KONFIG_TABEL = {
       let total = 0;
       data.forEach(item => total += angka(item.berat_bayar));
       return ['TOTAL', '', formatAngka(total, 3) + ' Kg'];
-    }
+    },
+    editFields: [
+      { key: 'tanggal', label: 'Tanggal', type: 'date' },
+      { key: 'berat_bayar', label: 'Berat (Kg)', type: 'number' }
+    ]
   },
 
   kematian: {
@@ -1989,7 +2192,11 @@ const KONFIG_TABEL = {
       let total = 0;
       data.forEach(item => total += angka(item.berat_bayar));
       return ['TOTAL', '', formatAngka(total, 3) + ' Kg'];
-    }
+    },
+    editFields: [
+      { key: 'tanggal', label: 'Tanggal', type: 'date' },
+      { key: 'berat_bayar', label: 'Berat (Kg)', type: 'number' }
+    ]
   },
 
   pinjaman: {
@@ -2004,7 +2211,13 @@ const KONFIG_TABEL = {
       let total = 0;
       data.forEach(item => total += angka(item.jumlah));
       return ['TOTAL', '', '', '', formatRupiah(total)];
-    }
+    },
+    editFields: [
+      { key: 'peminjam', label: 'Peminjam', type: 'select', options: ['Martunis', 'Muchsal'] },
+      { key: 'deskripsi', label: 'Deskripsi', type: 'text' },
+      { key: 'tanggal', label: 'Tanggal', type: 'date' },
+      { key: 'jumlah', label: 'Jumlah', type: 'number' }
+    ]
   },
 
   modalBahan: {
@@ -2018,7 +2231,14 @@ const KONFIG_TABEL = {
       let total = 0;
       data.forEach(item => total += angka(item.subtotal));
       return ['TOTAL', '', '', '', '', formatRupiah(total)];
-    }
+    },
+    editFields: [
+      { key: 'deskripsi', label: 'Deskripsi', type: 'text' },
+      { key: 'harga', label: 'Harga', type: 'number' },
+      { key: 'satuan', label: 'Satuan', type: 'text' },
+      { key: 'qty', label: 'Qty', type: 'number' }
+    ],
+    hitungUlang: (d) => ({ subtotal: angka(d.harga) * angka(d.qty) })
   },
 
   modalTambahan: {
@@ -2033,7 +2253,12 @@ const KONFIG_TABEL = {
       let total = 0;
       data.forEach(item => total += angka(item.subtotal));
       return ['TOTAL', '', '', formatRupiah(total)];
-    }
+    },
+    editFields: [
+      { key: 'deskripsi', label: 'Deskripsi', type: 'text' },
+      { key: 'tanggal', label: 'Tanggal', type: 'date' },
+      { key: 'subtotal', label: 'Jumlah', type: 'number' }
+    ]
   },
 
   hpp: {
@@ -2048,7 +2273,12 @@ const KONFIG_TABEL = {
       let total = 0;
       data.forEach(item => total += angka(item.jumlah));
       return ['TOTAL', '', '', formatRupiah(total)];
-    }
+    },
+    editFields: [
+      { key: 'deskripsi', label: 'Deskripsi', type: 'text' },
+      { key: 'tanggal', label: 'Tanggal', type: 'date' },
+      { key: 'jumlah', label: 'Jumlah', type: 'number' }
+    ]
   },
 
   dividen: {
@@ -2063,7 +2293,13 @@ const KONFIG_TABEL = {
       let total = 0;
       data.forEach(item => total += angka(item.jumlah));
       return ['TOTAL', '', '', formatRupiah(total), ''];
-    }
+    },
+    editFields: [
+      { key: 'penerima', label: 'Penerima', type: 'select', options: ['Muchsal', 'Martunis'] },
+      { key: 'tanggal', label: 'Tanggal', type: 'date' },
+      { key: 'jumlah', label: 'Jumlah', type: 'number' },
+      { key: 'keterangan', label: 'Keterangan', type: 'text' }
+    ]
   },
 
   stock: {
@@ -2081,7 +2317,13 @@ const KONFIG_TABEL = {
       let totalPcs = 0, totalKg = 0;
       data.forEach(item => { totalPcs += angka(item.jumlah_pcs); totalKg += angka(item.uom); });
       return ['TOTAL (Net)', '', '', formatAngka(totalPcs, 0), formatAngka(totalKg, 3) + ' Kg', ''];
-    }
+    },
+    editFields: [
+      { key: 'tanggal', label: 'Tanggal', type: 'date' },
+      { key: 'jumlah_pcs', label: 'Jumlah Pcs (isi minus utk kurangi)', type: 'number' },
+      { key: 'uom', label: 'Berat Kg (isi minus utk kurangi)', type: 'number' },
+      { key: 'keterangan', label: 'Keterangan', type: 'text' }
+    ]
   },
 
   stockPakan: {
@@ -2098,7 +2340,12 @@ const KONFIG_TABEL = {
       let total = 0;
       data.forEach(item => total += angka(item.jumlah_kg));
       return ['TOTAL (Net)', '', '', formatAngka(total, 3) + ' Kg', ''];
-    }
+    },
+    editFields: [
+      { key: 'tanggal', label: 'Tanggal', type: 'date' },
+      { key: 'jumlah_kg', label: 'Jumlah Kg (isi minus utk kurangi)', type: 'number' },
+      { key: 'keterangan', label: 'Keterangan', type: 'text' }
+    ]
   },
 
   pemberianPakan: {
@@ -2113,7 +2360,12 @@ const KONFIG_TABEL = {
       let total = 0;
       data.forEach(item => total += angka(item.jumlah_kg));
       return ['TOTAL', '', formatAngka(total, 3) + ' Kg', ''];
-    }
+    },
+    editFields: [
+      { key: 'tanggal', label: 'Tanggal', type: 'date' },
+      { key: 'jumlah_kg', label: 'Jumlah (Kg)', type: 'number' },
+      { key: 'keterangan', label: 'Keterangan', type: 'text' }
+    ]
   }
 
 };
@@ -2158,14 +2410,21 @@ async function muatDataUmum() {
           rows += '<div class="dataRow"><span class="labelKolom">' + konfig.kolom[idx] + '</span><span class="valueKolom">' + kolomBaris[idx] + '</span></div>';
         }
 
-        const tombolHapus = isAdmin
-          ? '<button class="btnHapus" onclick="hapusData(\'' + konfig.table + '\', ' + item.id + ')">Hapus</button>'
-          : '';
+        let tombolAksi = '';
+        if (isAdmin) {
+          tombolAksi = '<div style="display:flex; gap:6px;">';
+          if (konfig.editFields) {
+            tombolAksi += '<button class="btnEdit" onclick="bukaEditForm(\'' + jenis + '\', ' + item.id + ')">Edit</button>';
+          }
+          tombolAksi += '<button class="btnHapus" onclick="hapusData(\'' + konfig.table + '\', ' + item.id + ')">Hapus</button>';
+          tombolAksi += '</div>';
+        }
 
         const card = document.createElement('div');
         card.className = 'dataCard';
+        card.id = 'dataCard_' + jenis + '_' + item.id;
         card.innerHTML =
-          '<div class="dataCardTop"><span class="noBadge">#' + kolomBaris[0] + '</span>' + tombolHapus + '</div>' +
+          '<div class="dataCardTop"><span class="noBadge">#' + kolomBaris[0] + '</span>' + tombolAksi + '</div>' +
           rows;
 
         isi.appendChild(card);
@@ -2211,6 +2470,85 @@ async function hapusData(table, id) {
 
   } catch (err) {
     alert('Gagal menghapus data: ' + err.message);
+  }
+}
+
+
+/* =====================================================
+   EDIT DATA (Admin)
+===================================================== */
+function bukaEditForm(jenis, id) {
+
+  if (!AKUN_AKTIF || AKUN_AKTIF.role !== 'admin') {
+    alert('Hanya Admin yang bisa mengedit data.');
+    return;
+  }
+
+  const konfig = KONFIG_TABEL[jenis];
+  const item = DATA_TERKINI.find(d => d.id === id);
+  if (!item || !konfig.editFields) return;
+
+  const card = document.getElementById('dataCard_' + jenis + '_' + id);
+  if (!card) return;
+
+  let formHtml = '<div class="editForm">';
+
+  konfig.editFields.forEach(f => {
+    const nilai = (item[f.key] !== null && item[f.key] !== undefined) ? item[f.key] : '';
+
+    if (f.type === 'select') {
+      let opts = '';
+      f.options.forEach(o => {
+        opts += '<option value="' + o + '"' + (o === nilai ? ' selected' : '') + '>' + o + '</option>';
+      });
+      formHtml += '<label>' + f.label + '</label><select data-key="' + f.key + '">' + opts + '</select>';
+    } else {
+      formHtml += '<label>' + f.label + '</label><input data-key="' + f.key + '" type="' + f.type + '" value="' + nilai + '">';
+    }
+  });
+
+  formHtml +=
+    '<div style="display:flex; gap:8px; margin-top:14px;">' +
+    '<button class="btnHijau" style="flex:1; min-height:38px; font-size:13px; margin-top:0;" onclick="simpanEditData(\'' + jenis + '\', ' + id + ')">Simpan</button>' +
+    '<button class="btnAbu" style="flex:1; min-height:38px; font-size:13px; margin-top:0;" onclick="muatDataUmum()">Batal</button>' +
+    '</div></div>';
+
+  card.innerHTML = '<div class="dataCardTop"><span class="noBadge">Edit Data</span></div>' + formHtml;
+}
+
+async function simpanEditData(jenis, id) {
+
+  const konfig = KONFIG_TABEL[jenis];
+  const card = document.getElementById('dataCard_' + jenis + '_' + id);
+  if (!card) return;
+
+  const dataBaru = {};
+
+  konfig.editFields.forEach(f => {
+    const el = card.querySelector('[data-key="' + f.key + '"]');
+    let nilai = el.value;
+    if (f.type === 'number') nilai = angka(nilai);
+    if (nilai === '') nilai = null;
+    dataBaru[f.key] = nilai;
+  });
+
+  if (konfig.hitungUlang) {
+    Object.assign(dataBaru, konfig.hitungUlang(dataBaru));
+  }
+
+  try {
+    const url = SUPABASE_URL + '/rest/v1/' + konfig.table + '?id=eq.' + id;
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: SB_HEADERS,
+      body: JSON.stringify(dataBaru)
+    });
+    if (!res.ok) throw new Error(await res.text());
+
+    muatDataUmum();
+
+  } catch (err) {
+    alert('Gagal menyimpan perubahan: ' + err.message);
   }
 }
 
@@ -2344,85 +2682,4 @@ async function muatKeuntungan() {
     const profitKotor = profitLoss + totalPinjaman;
 
     const bagianMuchsal = profitKotor * 0.65;
-    const bagianMartunis = profitKotor * 0.25;
-    const danaDarurat = profitKotor * 0.10;
-
-    // Pinjaman & Dividen langsung dipotong dari bagian masing-masing
-    const sisaMuchsal = bagianMuchsal - pinjamanMuchsal - dividenMuchsal;
-    const sisaMartunis = bagianMartunis - pinjamanMartunis - dividenMartunis;
-
-    // ===== TAMPILKAN =====
-    document.getElementById('profitPengeluaran').innerText = formatRupiah(totalPengeluaran);
-    document.getElementById('profitPemasukan').innerText = formatRupiah(saldoKas);
-    document.getElementById('profitUtama').innerText = formatRupiah(profitLoss);
-    document.getElementById('profitTotalModal').innerText = formatRupiah(totalModalKeseluruhan);
-
-    document.getElementById('hasilMuchsal').innerText = formatRupiah(sisaMuchsal);
-    document.getElementById('rincianMuchsal').innerHTML =
-      'Bagian: ' + formatRupiah(bagianMuchsal) + '<br>' +
-      '– Pinjaman: ' + formatRupiah(pinjamanMuchsal) + '<br>' +
-      '– Dividen diambil: ' + formatRupiah(dividenMuchsal);
-
-    document.getElementById('hasilMartunis').innerText = formatRupiah(sisaMartunis);
-    document.getElementById('rincianMartunis').innerHTML =
-      'Bagian: ' + formatRupiah(bagianMartunis) + '<br>' +
-      '– Pinjaman: ' + formatRupiah(pinjamanMartunis) + '<br>' +
-      '– Dividen diambil: ' + formatRupiah(dividenMartunis);
-
-    document.getElementById('hasilDanaDarurat').innerText = formatRupiah(danaDarurat);
-
-    // ===== SESUAIKAN TAMPILAN BERDASARKAN ROLE =====
-    const isAdmin = AKUN_AKTIF && AKUN_AKTIF.role === 'admin';
-
-    if (isAdmin) {
-      document.getElementById('judulMuchsal').innerText = 'MUCHSAL (65%)';
-      document.getElementById('judulMartunis').innerText = 'MARTUNIS (25%)';
-      document.getElementById('judulDanaDarurat').innerText = 'DANA DARURAT (10%)';
-      document.getElementById('boxMuchsal').style.display = '';
-      document.getElementById('boxMartunis').style.display = '';
-    } else {
-      document.getElementById('judulDanaDarurat').innerText = 'DANA DARURAT';
-      // User cuma lihat bagian dia sendiri, tanpa persentase
-      if (AKUN_AKTIF && AKUN_AKTIF.nama_pemilik === 'Muchsal') {
-        document.getElementById('judulMuchsal').innerText = 'MUCHSAL';
-        document.getElementById('boxMuchsal').style.display = '';
-        document.getElementById('boxMartunis').style.display = 'none';
-      } else if (AKUN_AKTIF && AKUN_AKTIF.nama_pemilik === 'Martunis') {
-        document.getElementById('judulMartunis').innerText = 'MARTUNIS';
-        document.getElementById('boxMartunis').style.display = '';
-        document.getElementById('boxMuchsal').style.display = 'none';
-      } else {
-        document.getElementById('boxMuchsal').style.display = 'none';
-        document.getElementById('boxMartunis').style.display = 'none';
-      }
-    }
-
-    loading.style.display = 'none';
-    isi.style.display = 'block';
-
-  } catch (err) {
-    loading.innerText = 'Gagal memuat data: ' + err.message;
-  }
-}
-
-
-/* =====================================================
-   JALANKAN SAAT WEB DIBUKA
-===================================================== */
-(async function() {
-  muatSesiLogin();
-
-  if (AKUN_AKTIF) {
-    terapkanHakAkses();
-    tampilkanHalaman('halamanHome');
-    await muatPersentasePakan();
-    muatDashboard();
-  } else {
-    tampilkanHalaman('halamanLogin');
-  }
-})();
-
-</script>
-
-</body>
-</html>
+    const
