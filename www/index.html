@@ -2682,4 +2682,95 @@ async function muatKeuntungan() {
     const profitKotor = profitLoss + totalPinjaman;
 
     const bagianMuchsal = profitKotor * 0.65;
-    const
+    const bagianMartunis = profitKotor * 0.25;
+    const danaDaruratKotor = profitKotor * 0.10;
+
+    // ===== PENARIKAN DANA DARURAT =====
+    const penarikanDD = await sbSelect('dana_darurat_penarikan', '?select=jumlah');
+    let totalPenarikanDD = 0;
+    penarikanDD.forEach(row => totalPenarikanDD += angka(row.jumlah));
+
+    const sisaDanaDarurat = danaDaruratKotor - totalPenarikanDD;
+
+    // Pinjaman & Dividen langsung dipotong dari bagian masing-masing
+    const sisaMuchsal = bagianMuchsal - pinjamanMuchsal - dividenMuchsal;
+    const sisaMartunis = bagianMartunis - pinjamanMartunis - dividenMartunis;
+
+    // ===== TAMPILKAN =====
+    document.getElementById('profitPengeluaran').innerText = formatRupiah(totalPengeluaran);
+    document.getElementById('profitPemasukan').innerText = formatRupiah(saldoKas);
+    document.getElementById('profitUtama').innerText = formatRupiah(profitLoss);
+    document.getElementById('profitTotalModal').innerText = formatRupiah(totalModalKeseluruhan);
+
+    document.getElementById('hasilMuchsal').innerText = formatRupiah(sisaMuchsal);
+    document.getElementById('rincianMuchsal').innerHTML =
+      'Bagian: ' + formatRupiah(bagianMuchsal) + '<br>' +
+      '– Pinjaman: ' + formatRupiah(pinjamanMuchsal) + '<br>' +
+      '– Dividen diambil: ' + formatRupiah(dividenMuchsal);
+
+    document.getElementById('hasilMartunis').innerText = formatRupiah(sisaMartunis);
+    document.getElementById('rincianMartunis').innerHTML =
+      'Bagian: ' + formatRupiah(bagianMartunis) + '<br>' +
+      '– Pinjaman: ' + formatRupiah(pinjamanMartunis) + '<br>' +
+      '– Dividen diambil: ' + formatRupiah(dividenMartunis);
+
+    document.getElementById('hasilDanaDarurat').innerText = formatRupiah(sisaDanaDarurat);
+    document.getElementById('rincianDanaDarurat').innerHTML =
+      'Bagian: ' + formatRupiah(danaDaruratKotor) + '<br>' +
+      '– Sudah diambil: ' + formatRupiah(totalPenarikanDD);
+
+    // ===== SESUAIKAN TAMPILAN BERDASARKAN ROLE =====
+    const isAdmin = AKUN_AKTIF && AKUN_AKTIF.role === 'admin';
+
+    if (isAdmin) {
+      document.getElementById('judulMuchsal').innerText = 'MUCHSAL (65%)';
+      document.getElementById('judulMartunis').innerText = 'MARTUNIS (25%)';
+      document.getElementById('judulDanaDarurat').innerText = 'DANA DARURAT (10%)';
+      document.getElementById('boxMuchsal').style.display = '';
+      document.getElementById('boxMartunis').style.display = '';
+    } else {
+      document.getElementById('judulDanaDarurat').innerText = 'DANA DARURAT';
+      // User cuma lihat bagian dia sendiri, tanpa persentase
+      if (AKUN_AKTIF && AKUN_AKTIF.nama_pemilik === 'Muchsal') {
+        document.getElementById('judulMuchsal').innerText = 'MUCHSAL';
+        document.getElementById('boxMuchsal').style.display = '';
+        document.getElementById('boxMartunis').style.display = 'none';
+      } else if (AKUN_AKTIF && AKUN_AKTIF.nama_pemilik === 'Martunis') {
+        document.getElementById('judulMartunis').innerText = 'MARTUNIS';
+        document.getElementById('boxMartunis').style.display = '';
+        document.getElementById('boxMuchsal').style.display = 'none';
+      } else {
+        document.getElementById('boxMuchsal').style.display = 'none';
+        document.getElementById('boxMartunis').style.display = 'none';
+      }
+    }
+
+    loading.style.display = 'none';
+    isi.style.display = 'block';
+
+  } catch (err) {
+    loading.innerText = 'Gagal memuat data: ' + err.message;
+  }
+}
+
+
+/* =====================================================
+   JALANKAN SAAT WEB DIBUKA
+===================================================== */
+(async function() {
+  muatSesiLogin();
+
+  if (AKUN_AKTIF) {
+    terapkanHakAkses();
+    tampilkanHalaman('halamanHome');
+    await muatPersentasePakan();
+    muatDashboard();
+  } else {
+    tampilkanHalaman('halamanLogin');
+  }
+})();
+
+</script>
+
+</body>
+</html>
